@@ -1,22 +1,16 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import Cookies from "js-cookie"
 import Swal from "sweetalert2"
-import axios from "axios"
 import Header from "../../components/layouts/header"
 import NavBar from "../../components/layouts/navBar"
+import api from "../../config/axiosConfig"
 
 export default function Information() {
     const [data, setData] = useState({})
     const [name, setName] = useState('')
-    const token = Cookies.get('token')
 
     const fetchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}api/profile`, {
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-        })
+        const res = await api.get(`/profile`)
         setData(res.data)
         setName(res.data.name)
     }
@@ -43,13 +37,11 @@ export default function Information() {
     }
 
     const changeName = async () => {
-        const res = await axios.post(`${process.env.REACT_APP_API_URL}api/user/update/name`, {
-            name,
-        }, {
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-        })
+        const res = await api.post(`/user/update/name`,
+            {
+                name,
+            }
+        )
 
         if (res.status === 200) {
             Swal.fire({

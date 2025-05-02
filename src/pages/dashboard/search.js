@@ -1,35 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
-import Header from '../../components/layouts/header';
-import NavBar from '../../components/layouts/navBar';
-import ExamCard from '../../components/ui/examCard';
-import NProgress from 'nprogress';
+import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import Header from '../../components/layouts/header'
+import NavBar from '../../components/layouts/navBar'
+import ExamCard from '../../components/ui/examCard'
+import NProgress from 'nprogress'
+import api from '../../config/axiosConfig'
 
 
 
 export default function Search() {
-    const [data, setData] = useState([]);
-    const location = useLocation();
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const location = useLocation()
 
+    const fetchData = async () => {
+        try {
+            NProgress.start()
+            const q = new URLSearchParams(location.search).get("q") || ""
+            const res = await api.get(`/search`, {
+                params: { q: q }
+            })
+            setData(res.data)
+        } catch (error) {
+            console.error("Lỗi khi gọi API:", error)
+        } finally {
+            NProgress.done()
+            setLoading(!loading)
+        }
+    }
     useEffect(() => {
-        NProgress.start();
-        const fetchData = async () => {
-            try {
-                const q = new URLSearchParams(location.search).get("q") || "";
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}api/search`, {
-                    params: { q: q }
-                });
-                setData(response.data);
-            } catch (error) {
-                console.error("Lỗi khi gọi API:", error);
-            } finally {
-                NProgress.done();
-            }
-        };
-
-        fetchData();
-    }, [location.search]);
+        fetchData()
+    }, [location.search])
 
 
     return (
@@ -40,7 +41,7 @@ export default function Search() {
                 <div className="main-panel">
                     <div className="content-wrapper">
                         <div className="page-content p-xs-1">
-                            {data.length > 0 ? (
+                            {data.length > 0 && loading ? (
                                 <div className="row">
                                     {
                                         data.map((item) => (
@@ -69,5 +70,5 @@ export default function Search() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

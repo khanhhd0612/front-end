@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Header from "../../components/layouts/header";
+import api from '../../config/axiosConfig';
 
 const shuffleArray = (array) => {
     const shuffled = [...array];
@@ -24,7 +24,7 @@ const DoExam = () => {
     const timerRef = useRef(null);
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}api/exam/${id}`)
+        api.get(`/exam/${id}`)
             .then(res => {
                 const data = res.data;
                 setExamTitle(data.name || "Đề thi không có tên");
@@ -38,7 +38,8 @@ const DoExam = () => {
                 setQuestions(initializedQuestions);
             })
             .catch(err => {
-                if (err.response?.status === 500){
+                console.log(err)
+                if (err.response.status === 500){
                     navigate('/500');
                 }
             });

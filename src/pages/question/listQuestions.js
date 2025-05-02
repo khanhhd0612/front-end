@@ -1,26 +1,20 @@
-import Cookies from "js-cookie"
 import Header from "../../components/layouts/header"
 import NavBar from "../../components/layouts/navBar"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import Swal from "sweetalert2"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import api from "../../config/axiosConfig"
 
 export default function ListQuestion() {
     const navigate = useNavigate();
     const [data, setData] = useState([])
     const [nameExam, setNameExam] = useState('')
     const [originalName, setOriginalName] = useState('')
-    const token = Cookies.get('token')
     const { examId, sectionId } = useParams()
 
     const fetchData = async () => {
         try{
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}api/question/${examId}/${sectionId}`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            const res = await api.get(`/question/${examId}/${sectionId}`)
             setNameExam(res.data.section.name)
             setOriginalName(res.data.section.name)
             setData(res.data.section.questions)
@@ -37,9 +31,7 @@ export default function ListQuestion() {
 
     const deleteSection = async (questionId) => {
         try {
-            const res = await axios.delete(`${process.env.REACT_APP_API_URL}api/question/${examId}/${sectionId}/${questionId}`,
-                { headers: { authorization: `Bearer ${token}` } }
-            )
+            const res = await api.delete(`/question/${examId}/${sectionId}/${questionId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: res.data.message, icon: "success" })
@@ -74,10 +66,10 @@ export default function ListQuestion() {
                 Swal.fire({ title: "Tên chưa thay đổi", icon: "info" })
                 return;
             }
-            const res = await axios.put(`${process.env.REACT_APP_API_URL}api/exam/${examId}/sections/${sectionId}`,
+            const res = await api.put(`/exam/${examId}/sections/${sectionId}`,
                 {
                     name: nameExam
-                }, { headers: { authorization: `Bearer ${token}` } }
+                }
             )
             if (res.status === 200) {
                 Swal.fire({ title: "Đổi tên thành công", icon: "success" })

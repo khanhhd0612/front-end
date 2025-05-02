@@ -1,17 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from "../../config/axiosConfig"
 import nProgress from 'nprogress';
 
-export default function Register() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+export default function ResetPassword() {
+    const navigate = useNavigate();
+    const { token } = useParams()
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [errors, setErrors] = useState({});
     const [error, setError] = useState('');
-    const [agree, setAgree] = useState(false)
     const [captcha, setCaptcha] = useState('')
     const [captchaInput, setCaptchaInput] = useState('')
     const canvasRef = useRef(null)
@@ -56,60 +54,48 @@ export default function Register() {
         if (captcha) drawCaptcha()
     }, [captcha])
 
-    const handleRegister = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault()
+        if (password !== confirmPassword) {
+            setError('Mật khẩu không trùng khớp!');
+            return;
+        }
         if (captchaInput !== captcha) {
             setError("Mã xác thực không đúng")
             generateCaptcha()
             setCaptchaInput("")
             return
         }
-        setErrors({});
-        if (!agree) {
-            Swal.fire({
-                title: "Bạn phải đồng ý với điều khoản sử dụng !",
-                icon: "error",
-                draggable: true
-            });
-            return
-        }
-        if (password !== confirmPassword) {
-            setError('Mật khẩu không trùng khớp!');
-            generateCaptcha()
-            setCaptchaInput("")
-            return;
-        } else {
-            setError('');
-        }
-        register()
+        resetPassword()
     }
-    const register = async () => {
+    const resetPassword = async () => {
         try {
             nProgress.start()
-            const response = await api.post(`/register`, {
-                name,
-                email,
-                password,
-            });
-            if (response.data.user) {
-                setName('')
-                setEmail('')
+            const res = await api.put(`/reset/password/`,
+                {
+                    token,
+                    password,
+                });
+            if (res.status === 200) {
+                setError('')
                 setPassword('')
                 setConfirmPassword('')
-                setErrors('')
                 setCaptchaInput("")
-                setAgree(false)
                 Swal.fire({
-                    title: response.data.message,
+                    title: res.data.message,
                     icon: "success",
                     draggable: true
                 });
             }
-        } catch (error) {
-            if (error.response && error.response.data) {
+        } catch (err) {
+            if (err.response?.status === 404) {
                 generateCaptcha()
                 setCaptchaInput("")
-                setErrors(error.response.data.errors);
+                Swal.fire({
+                    title: err.response.data.message,
+                    icon: "error",
+                    draggable: true
+                });
             }
         } finally {
             nProgress.done()
@@ -125,34 +111,14 @@ export default function Register() {
                                 <div className="brand-logo">
                                     <img src="assets/images/logo.jpg" />
                                 </div>
-                                <h6 className="font-weight-light">Đăng ký để sử dụng dịch vụ !</h6>
-                                <form onSubmit={handleRegister} className="pt-3">
+                                <h6 className="font-weight-light">Lấy lại mật khẩu</h6>
+                                <form onSubmit={handleSubmit} className="pt-3">
                                     {error && <p style={{ color: 'red' }}>{error}</p>}
-                                    {errors.name && <p style={{ color: 'red' }}>{errors.name[0]}</p>}
-                                    {errors.email && <p style={{ color: 'red' }}>{errors.email[0]}</p>}
-                                    {errors.password && <p style={{ color: 'red' }}>{errors.password[0]}</p>}
-                                    <div className="form-group">
-                                        <input type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                    </div>
                                     <div className="form-group">
                                         <input type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} required />
                                     </div>
                                     <div className="form-group">
                                         <input type="password" className="form-control form-control-lg" id="exampleInputPassword2" placeholder="Xác nhận mật khẩu" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                                    </div>
-                                    <div className="mb-4">
-                                        <input
-                                            className="form-check-input mx-1"
-                                            type="checkbox"
-                                            checked={agree}
-                                            onChange={() => setAgree(!agree)}
-                                        />
-                                        <label className="form-check-label text-muted" htmlFor="autoNextCheckbox">
-                                            Tôi đồng ý với điều khoản sử dụng
-                                        </label>
                                     </div>
                                     <div className="form-group">
                                         <canvas ref={canvasRef} width={150} height={40} style={{ border: '1px solid #ccc', display: 'block', marginBottom: '10px' }} />
@@ -169,7 +135,7 @@ export default function Register() {
                                         </div>
                                     </div>
                                     <div className="mt-3 d-grid gap-2">
-                                        <button type='submit' className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Đăng ký</button>
+                                        <button type='submit' className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Lưu mật khẩu</button>
                                     </div>
                                     <div className="text-center mt-4 font-weight-light">Đã có tài khoản ? <Link to="/dang-nhap" className="text-primary">Đăng nhập</Link>
                                     </div>

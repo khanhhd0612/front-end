@@ -1,10 +1,9 @@
-import Cookies from "js-cookie"
 import Header from "../../components/layouts/header"
 import NavBar from "../../components/layouts/navBar"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import Swal from "sweetalert2"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import api from "../../config/axiosConfig"
 
 export default function ListSection() {
     const navigate = useNavigate();
@@ -12,16 +11,11 @@ export default function ListSection() {
     const [nameExam, setNameExam] = useState('')
     const [originalName, setOriginalName] = useState('')
     const [nameSection, setNameSection] = useState('')
-    const token = Cookies.get('token')
     const { examId } = useParams()
 
     const fetchData = async () => {
         try{
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}api/exam/${examId}/sections`, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
-            })
+            const res = await api.get(`/exam/${examId}/sections`)
             setNameExam(res.data.exam)
             setOriginalName(res.data.exam)
             setData(res.data.section)
@@ -38,9 +32,7 @@ export default function ListSection() {
 
     const deleteSection = async (sectionId) => {
         try {
-            const res = await axios.delete(`${process.env.REACT_APP_API_URL}api/exam/${examId}/sections/${sectionId}`,
-                { headers: { authorization: `Bearer ${token}` } }
-            )
+            const res = await api.delete(`/exam/${examId}/sections/${sectionId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: res.data.message, icon: "success" })
@@ -75,10 +67,10 @@ export default function ListSection() {
                 Swal.fire({ title: "Tên chưa thay đổi", icon: "info" })
                 return;
             }
-            const res = await axios.put(`${process.env.REACT_APP_API_URL}api/update/exam/${examId}`,
+            const res = await api.put(`/update/exam/${examId}`,
                 {
                     name: nameExam
-                }, { headers: { authorization: `Bearer ${token}` } }
+                }
             )
             if (res.status === 200) {
                 Swal.fire({ title: "Đổi tên thành công", icon: "success" })
@@ -101,9 +93,8 @@ export default function ListSection() {
                 return
             }
     
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}api/exam/${examId}/sections`,
-                { name: validateName },
-                { headers: { authorization: `Bearer ${token}` } }
+            const res = await api.post(`/exam/${examId}/sections`,
+                { name: validateName }
             )
     
             if (res.status === 200) {

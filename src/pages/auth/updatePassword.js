@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import Swal from "sweetalert2";
-import axios from "axios";
 import Header from "../../components/layouts/header";
 import NavBar from "../../components/layouts/navBar";
+import api from "../../config/axiosConfig"
+import nProgress from "nprogress";
 
 export default function ChangePassword() {
     const [password, setPassword] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const token = Cookies.get('token')
 
     const handleUpdatePassword = async (e) => {
         e.preventDefault()
@@ -30,23 +29,20 @@ export default function ChangePassword() {
     }
     const updatePassword = async () => {
         if (password !== confirmPassword) {
-            Swal.fire("Lỗi",'Mật khẩu không trùng khớp',"error");
+            Swal.fire("Lỗi", 'Mật khẩu không trùng khớp', "error");
             return;
-        }  
+        }
         try {
-            const res = await axios.put(`${process.env.REACT_APP_API_URL}api/user/update/password`, {
+            nProgress.start()
+            const res = await api.put(`/user/update/password`, {
                 oldPassword,
                 password,
-            }, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
             })
             if (res.status === 200) {
                 setPassword('')
                 setOldPassword('')
                 setConfirmPassword('')
-                 Swal.fire({
+                Swal.fire({
                     title: "Đổi mật khẩu thành công !",
                     icon: "success",
                     draggable: true
@@ -58,6 +54,8 @@ export default function ChangePassword() {
             } else {
                 Swal.fire("Lỗi", "Đã xảy ra lỗi khi đổi mật khẩu", "error");
             }
+        } finally{
+            nProgress.done()
         }
     }
     return (

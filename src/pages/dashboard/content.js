@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ExamCard from "../../components/ui/examCard"
-import NProgress from 'nprogress';
+import nProgress from 'nprogress';
+import api from '../../config/axiosConfig';
 
 export default function ContentDashBoard() {
     const [data, setData] = useState([]);
@@ -10,9 +10,9 @@ export default function ContentDashBoard() {
     const [page, setPage] = useState(1);
 
     const fetchData = async () => {
-        NProgress.start();
+        nProgress.start();
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}api/exam?page=${page}&limit=8`);
+            const response = await api.get(`/exam?page=${page}&limit=8`);
             const newData = response.data;
             if (newData.length === 0) {
                 setHasMore(false);
@@ -23,7 +23,7 @@ export default function ContentDashBoard() {
         } catch (error) {
             setHasMore(false);
         } finally {
-            NProgress.done();
+            nProgress.done();
         }
     };
 

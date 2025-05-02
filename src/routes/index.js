@@ -13,6 +13,8 @@ import CheckLogin from './privateRoutes';
 import ListQuestion from '../pages/question/listQuestions';
 import UpdateQuestionForm from '../pages/question/updateQuestion';
 import AddQuestionForm from '../pages/question/addQuestion';
+import ForgotPassword from '../pages/auth/forgotPassword';
+import ResetPassword from '../pages/auth/resetPassword';
 
 const routes = [
   {
@@ -26,6 +28,10 @@ const routes = [
   {
     path: '/dang-ky',
     element: <Register />,
+  },
+  {
+    path: '/quen-mat-khau',
+    element: <ForgotPassword />,
   },
   {
     path: '/bai-thi/:slug/:id',
@@ -48,6 +54,10 @@ const routes = [
     element: <CheckLogin><ChangePassword /></CheckLogin>,
   },
   {
+    path: '/reset/password/:token',
+    element: <ResetPassword />,
+  },
+  {
     path: '/thong-tin-nguoi-dung',
     element: <CheckLogin><Information /></CheckLogin>,
   },
@@ -61,11 +71,11 @@ const routes = [
   },
   {
     path: '/edit/exam/:examId/section/:sectionId/question/add',
-    element: <AddQuestionForm />,
+    element: <CheckLogin><AddQuestionForm /></CheckLogin>,
   },
   {
     path: '/edit/exam/:examId/section/:sectionId/question/:questionId',
-    element: <UpdateQuestionForm />,
+    element: <CheckLogin><UpdateQuestionForm /></CheckLogin>,
   },
   {
     path: '*',

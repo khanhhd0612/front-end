@@ -46,7 +46,7 @@ export default function Header() {
     return (
         <nav className="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div className="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-                <Link to="/" className="navbar-brand brand-logo"><img src={process.env.PUBLIC_URL + "/assets/images/logo.svg"} alt="logo" /></Link>
+                <Link to="/" className="navbar-brand brand-logo"><img src={process.env.PUBLIC_URL + "/assets/images/logo.jpg"} alt="logo" /></Link>
                 <Link to="/" className="navbar-brand brand-logo-mini"><img src={process.env.PUBLIC_URL + "/assets/images/logo-mini.svg"}
                     alt="logo" /></Link>
             </div>

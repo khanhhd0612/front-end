@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import Header from '../../components/layouts/header';
 import NavBar from '../../components/layouts/navBar';
-import axios from 'axios';
 import Cookies from 'js-cookie'
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import api from '../../config/axiosConfig';
 
 export default function AddQuestionForm() {
     const [questionText, setQuestionText] = useState('');
@@ -19,7 +19,6 @@ export default function AddQuestionForm() {
         newAnswers[index] = value;
         setAnswers(newAnswers);
 
-        // Nếu đang chọn đúng câu đó là đáp án đúng, thì cập nhật luôn
         if (correctAnswer === answers[index]) {
             setCorrectAnswer(value);
         }
@@ -31,7 +30,7 @@ export default function AddQuestionForm() {
 
     const removeAnswer = (index) => {
         const removed = answers[index];
-        if (index == 0) {
+        if (answers.length === 1) {
             Swal.fire("Lỗi", 'Câu hỏi phải có ít nhất 1 đáp án', "error")
             return
         }
@@ -64,7 +63,7 @@ export default function AddQuestionForm() {
             correctAnswers: correctAnswer
         }
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}api/question/${examId}/${sectionId}`,
+            const res = await api.post(`/question/${examId}/${sectionId}`,
                 {
                     text: questionText,
                     answers: answers,

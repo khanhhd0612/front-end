@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
 import Swal from 'sweetalert2';
 import Header from '../../components/layouts/header';
 import NavBar from '../../components/layouts/navBar';
+import api from '../../config/axiosConfig';
 
 export default function AddExam() {
     const [nameExam, setNameExam] = useState('');
@@ -11,7 +10,6 @@ export default function AddExam() {
     const [results, setResults] = useState(null);
     const [parsedHtml, setParsedHtml] = useState('');
     const [loading, setLoading] = useState(false);
-    const token = Cookies.get('token')
 
     const parseQuestions = (text) => {
         const lines = text.split('\n');
@@ -117,13 +115,9 @@ export default function AddExam() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}api/exam`, {
+            const response = await api.post(`/exam`, {
                 name: nameExam,
                 sections: results.sections,
-            }, {
-                headers: {
-                    authorization: `Bearer ${token}`
-                }
             });
 
             if (response.status === 201) {

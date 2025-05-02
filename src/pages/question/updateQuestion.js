@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/layouts/header';
 import NavBar from '../../components/layouts/navBar';
-import axios from 'axios';
 import Cookies from 'js-cookie'
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import api from '../../config/axiosConfig';
 
 export default function UpdateQuestionForm() {
     const navigate = useNavigate();
@@ -17,9 +17,7 @@ export default function UpdateQuestionForm() {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}api/question/${examId}/${sectionId}/${questionId}`,
-                { headers: { authorization: `Bearer ${token}` } }
-            )
+            const res = await api.get(`/question/${examId}/${sectionId}/${questionId}`)
             console.log(res)
             const question = res.data.question
             setQuestionText(question.text)
@@ -52,7 +50,7 @@ export default function UpdateQuestionForm() {
 
     const removeAnswer = (index) => {
         const removed = answers[index];
-        if (index == 0) {
+        if (answers.length === 1) {
             Swal.fire("Lỗi", 'Câu hỏi phải có ít nhất 1 đáp án', "error")
             return
         }
@@ -94,13 +92,12 @@ export default function UpdateQuestionForm() {
             return;
         }
         try {
-            const res = await axios.put(`${process.env.REACT_APP_API_URL}api/question/${examId}/${sectionId}/${questionId}`,
+            const res = await api.put(`/question/${examId}/${sectionId}/${questionId}`,
                 {
                     text: questionText,
                     answers: answers,
                     correctAnswers: correctAnswer
-                },
-                { headers: { authorization: `Bearer ${token}` } }
+                }
             )
             if (res.status === 200) {
                 Swal.fire({

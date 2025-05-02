@@ -1,27 +1,29 @@
-import Cookies from "js-cookie"
 import Header from "../../components/layouts/header"
 import NavBar from "../../components/layouts/navBar"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import Swal from "sweetalert2"
 import { Link, useSearchParams } from "react-router-dom"
 import ReactPaginate from "react-paginate"
+import api from "../../config/axiosConfig"
+import nProgress from "nprogress"
 
 export default function ListExam() {
     const [data, setData] = useState([])
     const [totalPages, setTotalPages] = useState(1)
     const [searchParams, setSearchParams] = useSearchParams()
-    const page = parseInt(searchParams.get("page")) || 1    
-    const token = Cookies.get('token')
+    const page = parseInt(searchParams.get("page")) || 1
 
     const fetchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}api/get/exam/of/user?page=${page}&limit=8`, {
-            headers: {
-                authorization: `Bearer ${token}`
-            }
-        })
-        setData(res.data.exam)
-        setTotalPages(res.data.totalPages)
+        try {
+            nProgress.start()
+            const res = await api.get(`/user/exam/?page=${page}&limit=8`)
+            setData(res.data.exam)
+            setTotalPages(res.data.totalPages)
+        } catch (err) {
+            Swal.fire({ title: err, icon: "error" })
+        } finally {
+            nProgress.done()
+        }
     }
 
     useEffect(() => {
@@ -30,9 +32,8 @@ export default function ListExam() {
 
     const deleteExam = async (examId) => {
         try {
-            const res = await axios.delete(`${process.env.REACT_APP_API_URL}api/exam/delete/${examId}`,
-                { headers: { authorization: `Bearer ${token}` } }
-            )
+            nProgress.start()
+            const res = await api.delete(`/exam/delete/${examId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: "Xóa thành công", icon: "success" })
@@ -44,6 +45,8 @@ export default function ListExam() {
             } else {
                 Swal.fire("Lỗi", "Đã xảy ra lỗi khi xóa bài thi", "error");
             }
+        } finally {
+            nProgress.done()
         }
     }
 

@@ -1,16 +1,13 @@
 import { Link } from "react-router-dom"
-import Cookies from 'js-cookie'
 import React, { useState, useRef, useEffect } from 'react'
-import nProgress from 'nprogress'
 import api from "../../config/axiosConfig"
+import Swal from "sweetalert2"
+import NProgress from 'nprogress'
 
-export default function Login() {
+export default function ForgotPassword() {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const [captcha, setCaptcha] = useState('')
     const [captchaInput, setCaptchaInput] = useState('')
-    const [errorLogin, setErrorLogin] = useState('')
-    const [successLogin, setSuccessLogin] = useState('')
     const canvasRef = useRef(null)
 
     const generateCaptcha = () => {
@@ -37,7 +34,8 @@ export default function Login() {
             ctx.restore()
         }
 
-        for (let i = 0; i < 5; i++) {
+        // Noise
+        for (let i = 0; i < 6; i++) {
             ctx.beginPath()
             ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height)
             ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height)
@@ -54,37 +52,39 @@ export default function Login() {
         if (captcha) drawCaptcha()
     }, [captcha])
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         if (captchaInput !== captcha) {
-            setErrorLogin("Mã xác thực không đúng")
-            setSuccessLogin("")
+            Swal.fire({
+                title: "Mã xác thực không đúng",
+                icon: "error"
+            })
             generateCaptcha()
             setCaptchaInput("")
             return
         }
 
-        nProgress.start()
+        NProgress.start()
         try {
-            const response = await api.post(`/login`, { email, password })
-            if (response.data.message) {
-                setEmail('')
-                setPassword('')
-                setCaptchaInput('')
-                setErrorLogin('')
-                Cookies.set('token', response.data.token, { expires: 7 })
-                setSuccessLogin(response.data.message)
-                window.location = "/"
-            }
-        } catch (error) {
-            if (error.response && error.response.data) {
-                setErrorLogin(error.response.data.message)
-                setSuccessLogin("")
-                generateCaptcha()
+            const res = await api.post(`forgot/password/`, { email })
+            if (res.status === 200) {
+                Swal.fire({
+                    title: res.data.message,
+                    icon: "success",
+                    draggable: true,
+                })
+                setEmail("")
                 setCaptchaInput("")
+                generateCaptcha()
             }
+        } catch (err) {
+            Swal.fire({
+                title: err.response?.data?.message || "Đã có lỗi xảy ra",
+                icon: "error",
+                draggable: true,
+            })
         } finally {
-            nProgress.done()
+            NProgress.done()
         }
     }
 
@@ -98,22 +98,16 @@ export default function Login() {
                                 <div className="brand-logo">
                                     <img src="assets/images/logo.jpg" />
                                 </div>
-                                <h6 className="font-weight-light">Đăng nhập để tiếp tục</h6>
-                                <form onSubmit={handleLogin} className="pt-3">
-                                    {errorLogin && <p style={{ color: 'red' }}>{errorLogin}</p>}
-                                    {successLogin && <p style={{ color: 'green' }}>{successLogin}</p>}
+                                <h6 className="font-weight-light">Nhập email của bạn </h6>
+                                <form onSubmit={handleSubmit} className="pt-3">
                                     <div className="form-group">
                                         <input type="email" className="form-control form-control-lg" placeholder="Email"
                                             value={email} onChange={(e) => setEmail(e.target.value)} required />
                                     </div>
-                                    <div className="form-group">
-                                        <input type="password" className="form-control form-control-lg" placeholder="Mật khẩu"
-                                            value={password} onChange={(e) => setPassword(e.target.value)} required />
-                                    </div>
 
                                     {/* CAPTCHA */}
                                     <div className="form-group">
-                                        <canvas ref={canvasRef} width={160} height={40} style={{ border: '1px solid #ccc', display: 'block', marginBottom: '10px' }} />
+                                        <canvas ref={canvasRef} width={150} height={40} style={{ border: '1px solid #ccc', display: 'block', marginBottom: '10px' }} />
                                         <div className="d-flex">
                                             <input
                                                 type="text"
@@ -128,13 +122,7 @@ export default function Login() {
                                     </div>
 
                                     <div className="mt-3 d-grid gap-2">
-                                        <button type="submit" className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Đăng nhập</button>
-                                    </div>
-                                    <div className="my-2 d-flex justify-content-between align-items-center">
-                                        <Link to="/quen-mat-khau" className="auth-link text-primary">Quên mật khẩu?</Link>
-                                    </div>
-                                    <div className="text-center mt-4 font-weight-light">
-                                        Không có tài khoản? <Link to="/dang-ky" className="text-primary">Đăng ký</Link>
+                                        <button type="submit" className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Gửi</button>
                                     </div>
                                 </form>
                             </div>
