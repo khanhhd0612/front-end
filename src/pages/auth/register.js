@@ -12,58 +12,11 @@ export default function Register() {
     const [errors, setErrors] = useState({});
     const [error, setError] = useState('');
     const [agree, setAgree] = useState(false)
-    const [captcha, setCaptcha] = useState('')
-    const [captchaInput, setCaptchaInput] = useState('')
-    const canvasRef = useRef(null)
-
-    const generateCaptcha = () => {
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
-        setCaptcha(code)
-    }
-    const drawCaptcha = () => {
-        const canvas = canvasRef.current
-        const ctx = canvas.getContext("2d")
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-        ctx.fillStyle = "#f0f0f0"
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        ctx.font = "24px Arial"
-        ctx.fillStyle = "#000"
-        for (let i = 0; i < captcha.length; i++) {
-            const angle = (Math.random() - 0.5) * 0.4
-            ctx.save()
-            ctx.translate(20 + i * 22, 30)
-            ctx.rotate(angle)
-            ctx.fillText(captcha[i], 0, 0)
-            ctx.restore()
-        }
-
-        for (let i = 0; i < 5; i++) {
-            ctx.beginPath()
-            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height)
-            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height)
-            ctx.strokeStyle = "rgba(0,0,0,0.1)"
-            ctx.stroke()
-        }
-    }
-
-    useEffect(() => {
-        generateCaptcha()
-    }, [])
-
-    useEffect(() => {
-        if (captcha) drawCaptcha()
-    }, [captcha])
+    const [isDisabled, setIsDisabled] = useState(false)
 
     const handleRegister = (e) => {
         e.preventDefault()
-        if (captchaInput !== captcha) {
-            setError("Mã xác thực không đúng")
-            generateCaptcha()
-            setCaptchaInput("")
-            return
-        }
+        setIsDisabled(true)
         setErrors({});
         if (!agree) {
             Swal.fire({
@@ -75,8 +28,6 @@ export default function Register() {
         }
         if (password !== confirmPassword) {
             setError('Mật khẩu không trùng khớp!');
-            generateCaptcha()
-            setCaptchaInput("")
             return;
         } else {
             setError('');
@@ -97,7 +48,6 @@ export default function Register() {
                 setPassword('')
                 setConfirmPassword('')
                 setErrors('')
-                setCaptchaInput("")
                 setAgree(false)
                 Swal.fire({
                     title: response.data.message,
@@ -107,12 +57,11 @@ export default function Register() {
             }
         } catch (error) {
             if (error.response && error.response.data) {
-                generateCaptcha()
-                setCaptchaInput("")
                 setErrors(error.response.data.errors);
             }
         } finally {
             nProgress.done()
+            setIsDisabled(false)
         }
     }
     return (
@@ -154,22 +103,19 @@ export default function Register() {
                                             Tôi đồng ý với điều khoản sử dụng
                                         </label>
                                     </div>
-                                    <div className="form-group">
-                                        <canvas ref={canvasRef} width={150} height={40} style={{ border: '1px solid #ccc', display: 'block', marginBottom: '10px' }} />
-                                        <div className="d-flex">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Nhập mã CAPTCHA"
-                                                value={captchaInput}
-                                                onChange={(e) => setCaptchaInput(e.target.value)}
-                                                required
-                                            />
-                                            <button type="button" className="btn btn-light ms-2" onClick={generateCaptcha}><i className="fa fa-history"></i></button>
-                                        </div>
-                                    </div>
                                     <div className="mt-3 d-grid gap-2">
-                                        <button type='submit' className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Đăng ký</button>
+                                        <button type="submit"
+                                            className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                                            disabled={isDisabled}
+                                        >
+                                            {isDisabled ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                </>
+                                            ) : (
+                                                "Đăng ký"
+                                            )}
+                                        </button>
                                     </div>
                                     <div className="text-center mt-4 font-weight-light">Đã có tài khoản ? <Link to="/dang-nhap" className="text-primary">Đăng nhập</Link>
                                     </div>

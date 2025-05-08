@@ -12,7 +12,6 @@ const CheckLogin = ({ children }) => {
             Swal.fire({
                 icon: "warning",
                 title: "Bạn cần đăng nhập để sử dụng chức năng này!",
-                confirmButtonText: "Đăng nhập"
             }).then(() => {
                 setRedirect(true);
             });

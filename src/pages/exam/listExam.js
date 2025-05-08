@@ -88,7 +88,7 @@ export default function ListExam() {
                                                         <tr>
                                                             <th>Tên bài thi</th>
                                                             <th>Số phần thi</th>
-                                                            <th>Tạo lúc</th>
+                                                            <th>Ngày tạo</th>
                                                             <th>Trạng thái</th>
                                                         </tr>
                                                     </thead>

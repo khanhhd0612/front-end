@@ -75,9 +75,9 @@ export default function Information() {
                                         <label htmlFor="exampleInputConfirmPassword1">Vai trò</label>
                                         <input type="text" className="form-control" id="exampleInputConfirmPassword1" placeholder="Vai trò" value={data.role} readOnly />
                                     </div>
-                                    <button type="submit" className="btn btn-gradient-primary me-2">Gửi</button>
-                                    <Link to="/doi-mat-khau" className="btn btn-gradient-primary me-2">Đổi mật khẩu</Link>
-                                    <Link to="/" className="btn btn-light">Hủy</Link>
+                                    <button type="submit" className="btn btn-gradient-primary m-2">Gửi</button>
+                                    <Link to="/doi-mat-khau" className="btn btn-gradient-primary m-2 ">Đổi mật khẩu</Link>
+                                    <Link to="/" className="btn btn-light m-2">Hủy</Link>
                                 </form>
                             </div>
                         </div>

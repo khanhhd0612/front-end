@@ -1,58 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from "../../config/axiosConfig"
 import nProgress from 'nprogress';
 
 export default function ResetPassword() {
-    const navigate = useNavigate();
     const { token } = useParams()
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
-    const [captcha, setCaptcha] = useState('')
-    const [captchaInput, setCaptchaInput] = useState('')
-    const canvasRef = useRef(null)
+    const [isDisabled, setIsDisabled] = useState(false)
 
-    const generateCaptcha = () => {
-        const code = Math.floor(100000 + Math.random() * 900000).toString()
-        setCaptcha(code)
-    }
-    const drawCaptcha = () => {
-        const canvas = canvasRef.current
-        const ctx = canvas.getContext("2d")
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-        ctx.fillStyle = "#f0f0f0"
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        ctx.font = "24px Arial"
-        ctx.fillStyle = "#000"
-        for (let i = 0; i < captcha.length; i++) {
-            const angle = (Math.random() - 0.5) * 0.4
-            ctx.save()
-            ctx.translate(20 + i * 22, 30)
-            ctx.rotate(angle)
-            ctx.fillText(captcha[i], 0, 0)
-            ctx.restore()
-        }
-
-        for (let i = 0; i < 5; i++) {
-            ctx.beginPath()
-            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height)
-            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height)
-            ctx.strokeStyle = "rgba(0,0,0,0.1)"
-            ctx.stroke()
-        }
-    }
-
-    useEffect(() => {
-        generateCaptcha()
-    }, [])
-
-    useEffect(() => {
-        if (captcha) drawCaptcha()
-    }, [captcha])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -60,15 +18,11 @@ export default function ResetPassword() {
             setError('Mật khẩu không trùng khớp!');
             return;
         }
-        if (captchaInput !== captcha) {
-            setError("Mã xác thực không đúng")
-            generateCaptcha()
-            setCaptchaInput("")
-            return
-        }
         resetPassword()
     }
     const resetPassword = async () => {
+        setIsDisabled(true)
+
         try {
             nProgress.start()
             const res = await api.put(`/reset/password/`,
@@ -80,7 +34,6 @@ export default function ResetPassword() {
                 setError('')
                 setPassword('')
                 setConfirmPassword('')
-                setCaptchaInput("")
                 Swal.fire({
                     title: res.data.message,
                     icon: "success",
@@ -89,8 +42,6 @@ export default function ResetPassword() {
             }
         } catch (err) {
             if (err.response?.status === 404) {
-                generateCaptcha()
-                setCaptchaInput("")
                 Swal.fire({
                     title: err.response.data.message,
                     icon: "error",
@@ -99,6 +50,7 @@ export default function ResetPassword() {
             }
         } finally {
             nProgress.done()
+            setIsDisabled(false)
         }
     }
     return (
@@ -120,22 +72,19 @@ export default function ResetPassword() {
                                     <div className="form-group">
                                         <input type="password" className="form-control form-control-lg" id="exampleInputPassword2" placeholder="Xác nhận mật khẩu" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                                     </div>
-                                    <div className="form-group">
-                                        <canvas ref={canvasRef} width={150} height={40} style={{ border: '1px solid #ccc', display: 'block', marginBottom: '10px' }} />
-                                        <div className="d-flex">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Nhập mã CAPTCHA"
-                                                value={captchaInput}
-                                                onChange={(e) => setCaptchaInput(e.target.value)}
-                                                required
-                                            />
-                                            <button type="button" className="btn btn-light ms-2" onClick={generateCaptcha}><i className="fa fa-history"></i></button>
-                                        </div>
-                                    </div>
                                     <div className="mt-3 d-grid gap-2">
-                                        <button type='submit' className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn">Lưu mật khẩu</button>
+                                        <button type="submit"
+                                            className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                                            disabled={isDisabled}
+                                        >
+                                            {isDisabled ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                </>
+                                            ) : (
+                                                "Lưu mật khẩu"
+                                            )}
+                                        </button>
                                     </div>
                                     <div className="text-center mt-4 font-weight-light">Đã có tài khoản ? <Link to="/dang-nhap" className="text-primary">Đăng nhập</Link>
                                     </div>

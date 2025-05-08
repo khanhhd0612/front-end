@@ -51,7 +51,7 @@ export default function ContentDashBoard() {
                         <div className="row">
                             {
                                 data.map((item) => (
-                                    <div key={item._id} className=" col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3 stretch-card grid-margin">
+                                    <div key={item._id} className=" col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 stretch-card grid-margin">
                                         <ExamCard
                                             id={item._id}
                                             name={item.name}

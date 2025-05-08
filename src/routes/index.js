@@ -19,7 +19,7 @@ import ResetPassword from '../pages/auth/resetPassword';
 const routes = [
   {
     path: '/',
-    element: <CheckLogin><DashBoard /></CheckLogin>,
+    element: <DashBoard />,
   },
   {
     path: '/dang-nhap',
@@ -39,7 +39,7 @@ const routes = [
   },
   {
     path: '/tim-kiem',
-    element: <CheckLogin><Search /></CheckLogin>,
+    element: <Search />,
   },
   {
     path: '/them-bai-thi',

@@ -1,19 +1,50 @@
-import React, { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import Cookies from 'js-cookie'
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+
 export default function Header() {
     const navigate = useNavigate();
-    const [query, setQuery] = useState('')
-    const handleSearch = async (e) => {
-        e.preventDefault()
+    const [query, setQuery] = useState('');
+    const [isLogin, setIsLogin] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const dropdownRef = useRef(null);
+    const sidebarRef = useRef(null);
+
+    useEffect(() => {
+        const token = Cookies.get("token");
+        setIsLogin(!!token);
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setIsDropdownOpen(false);
+            }
+            if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+                setIsSidebarOpen(false);
+                document.getElementById('sidebar')?.classList.remove('active');
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const handleSearch = (e) => {
+        e.preventDefault();
         if (query) {
             navigate(`/tim-kiem?q=${query}`);
         }
-    }
+    };
+
     const handleLogout = () => {
-        Cookies.remove('token')
-        window.location = "/dang-nhap"
-    }
+        Cookies.remove("token");
+        window.location = "/dang-nhap";
+    };
+
     const handleClickFullScreen = () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch((err) => {
@@ -22,33 +53,31 @@ export default function Header() {
         } else {
             document.exitFullscreen();
         }
-    }
-    const body = document.getElementsByTagName('body')[0]
+    };
+
     const toggleClick = () => {
-        body.classList.toggle('sidebar-icon-only');
+        const body = document.body;
+        body.classList.toggle("sidebar-icon-only");
+    };
+
+    const handleClickNavBar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+        document.getElementById('sidebar')?.classList.toggle('active');
     };
 
     const handleClickUser = () => {
-        const profileDropdown = document.getElementById('profileDropdown')
-        const navbarDropdown = document.getElementById('navbar-dropdown')
-        if(profileDropdown || navbarDropdown){
-            profileDropdown.classList.toggle('show')
-            navbarDropdown.classList.toggle('show')
-        }
-    }
+        setIsDropdownOpen(!isDropdownOpen);
+    };
 
-    const handleClickNavBar = () => {
-        const navBar = document.getElementById('sidebar')
-        if (navBar) {
-            navBar.classList.toggle('active')
-        }
-    }
     return (
         <nav className="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
             <div className="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-                <Link to="/" className="navbar-brand brand-logo"><img src={process.env.PUBLIC_URL + "/assets/images/logo.jpg"} alt="logo" /></Link>
-                <Link to="/" className="navbar-brand brand-logo-mini"><img src={process.env.PUBLIC_URL + "/assets/images/logo-mini.svg"}
-                    alt="logo" /></Link>
+                <Link to="/" className="navbar-brand brand-logo">
+                    <img src={process.env.PUBLIC_URL + "/assets/images/logo.jpg"} alt="logo" />
+                </Link>
+                <Link to="/" className="navbar-brand brand-logo-mini">
+                    <img src={process.env.PUBLIC_URL + "/assets/images/logo-mini.svg"} alt="logo" />
+                </Link>
             </div>
             <div className="navbar-menu-wrapper d-flex align-items-stretch">
                 <button className="navbar-toggler navbar-toggler align-self-center" type="button" onClick={toggleClick}>
@@ -72,21 +101,30 @@ export default function Header() {
                     </form>
                 </div>
                 <ul className="navbar-nav navbar-nav-right">
-                    <li className="nav-item nav-profile dropdown" onClick={handleClickUser}>
-                        <a className="nav-link dropdown-toggle" id="profileDropdown">
-                            <div className="nav-profile-img">
-                                <img src={process.env.PUBLIC_URL + "/assets/images/user_img.png"} alt="image" />
-                                <span className="availability-status online"></span>
+                    {isLogin ? (
+                        <li className="nav-item nav-profile dropdown" ref={dropdownRef}>
+                            <a className="nav-link dropdown-toggle" id="profileDropdown" onClick={handleClickUser}>
+                                <div className="nav-profile-img">
+                                    <img src={process.env.PUBLIC_URL + "/assets/images/user_img.png"} alt="user" />
+                                    <span className="availability-status online"></span>
+                                </div>
+                            </a>
+                            <div id="navbar-dropdown" className={`dropdown-menu navbar-dropdown ${isDropdownOpen ? "show" : ""}`}>
+                                <Link to="/thong-tin-nguoi-dung" className="dropdown-item">
+                                    <i className="mdi mdi-cached me-2 text-success"></i> Hồ sơ
+                                </Link>
+                                <div className="dropdown-divider"></div>
+                                <button onClick={handleLogout} className="dropdown-item">
+                                    <i className="mdi mdi-logout me-2 text-primary"></i> Đăng xuất
+                                </button>
                             </div>
-                        </a>
-                        <div id="navbar-dropdown" className="dropdown-menu navbar-dropdown">
-                            <Link to='/thong-tin-nguoi-dung' className="dropdown-item">
-                                <i className="mdi mdi-cached me-2 text-success"></i> Hồ sơ</Link>
-                            <div className="dropdown-divider"></div>
-                            <button onClick={handleLogout} className="dropdown-item">
-                                <i className="mdi mdi-logout me-2 text-primary"></i>Đăng xuất</button>
-                        </div>
-                    </li>
+                        </li>
+                    ) : (
+                        <li>
+                            <button className="btn">Bạn chưa đăng nhập</button>
+                            <Link to="/dang-nhap" className="btn btn-primary">Đăng nhập</Link>
+                        </li>
+                    )}
                     <li className="nav-item d-none d-lg-block full-screen-link">
                         <a className="nav-link">
                             <i className="mdi mdi-fullscreen" onClick={handleClickFullScreen}></i>
@@ -97,7 +135,10 @@ export default function Header() {
                     onClick={handleClickNavBar}>
                     <span className="mdi mdi-menu"></span>
                 </button>
+                <div ref={sidebarRef}>
+                </div>
             </div>
+
         </nav>
-    )
+    );
 }
