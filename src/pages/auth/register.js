@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import "./../../assets/css/auth.css"
+import React, { useState } from 'react'
+import nProgress from 'nprogress'
 import api from "../../config/axiosConfig"
-import nProgress from 'nprogress';
+import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 export default function Register() {
     const [name, setName] = useState('');
@@ -24,10 +25,12 @@ export default function Register() {
                 icon: "error",
                 draggable: true
             });
+            setIsDisabled(false)
             return
         }
         if (password !== confirmPassword) {
             setError('Mật khẩu không trùng khớp!');
+            setIsDisabled(false)
             return;
         } else {
             setError('');
@@ -65,61 +68,73 @@ export default function Register() {
         }
     }
     return (
-        <div className="container-scroller">
-            <div className="container-fluid page-body-wrapper full-page-wrapper">
-                <div className="content-wrapper d-flex align-items-center auth">
-                    <div className="row flex-grow">
-                        <div className="col-lg-4 mx-auto">
-                            <div className="auth-form-light text-left p-5">
-                                <div className="brand-logo">
-                                    <img src="assets/images/logo.jpg" />
+        <div>
+            <div className="content">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6 d-none d-lg-block">
+                            <img src="/assets/images/undraw_remotely_2j6y.svg" alt="Image" className="img-fluid" />
+                        </div>
+                        <div className="col-md-6 contents">
+                            <div className="p-5">
+                                <div className="row justify-content-center">
+                                    <div className="col-md-8">
+                                        <div className="mb-4">
+                                            <h3>Đăng ký </h3>
+                                        </div>
+                                        <form onSubmit={handleRegister}>
+                                            {error && <p style={{ color: 'red' }}>{error}</p>}
+                                            {errors.name && <p style={{ color: 'red' }}>{errors.name[0]}</p>}
+                                            {errors.email && <p style={{ color: 'red' }}>{errors.email[0]}</p>}
+                                            {errors.password && <p style={{ color: 'red' }}>{errors.password[0]}</p>}
+                                            <div className="mb-3">
+                                                <label htmlFor="name" className="form-label">Tên</label>
+                                                <input type="text" className="form-control" id="name"
+                                                    value={name} onChange={(e) => setName(e.target.value)} required />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
+                                                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                                                    value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="password" className="form-label">Mật khẩu </label>
+                                                <input type="password" className="form-control" id="password"
+                                                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="confirmPass" className="form-label">Xác nhận mật khẩu </label>
+                                                <input type="password" className="form-control" id="confirmPass"
+                                                    value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                                            </div>
+                                            <div className="mb-4">
+                                                <input
+                                                    className="form-check-input mx-1"
+                                                    type="checkbox"
+                                                    checked={agree}
+                                                    onChange={() => setAgree(!agree)}
+                                                />
+                                                <label className="form-check-label text-muted" htmlFor="autoNextCheckbox">
+                                                    Tôi đồng ý với điều khoản sử dụng
+                                                </label>
+                                            </div>
+                                            <button type="submit"
+                                                className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                                                disabled={isDisabled}
+                                            >
+                                                {isDisabled ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                    </>
+                                                ) : (
+                                                    "Đăng ký"
+                                                )}
+                                            </button>
+                                        </form>
+                                        <div className="text-center mt-4 font-weight-light">Đã có tài khoản ? <Link to="/dang-nhap" className="text-primary">Đăng nhập</Link>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h6 className="font-weight-light">Đăng ký để sử dụng dịch vụ !</h6>
-                                <form onSubmit={handleRegister} className="pt-3">
-                                    {error && <p style={{ color: 'red' }}>{error}</p>}
-                                    {errors.name && <p style={{ color: 'red' }}>{errors.name[0]}</p>}
-                                    {errors.email && <p style={{ color: 'red' }}>{errors.email[0]}</p>}
-                                    {errors.password && <p style={{ color: 'red' }}>{errors.password[0]}</p>}
-                                    <div className="form-group">
-                                        <input type="text" className="form-control form-control-lg" id="exampleInputUsername1" placeholder="Họ và tên" value={name} onChange={(e) => setName(e.target.value)} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="password" className="form-control form-control-lg" id="exampleInputPassword2" placeholder="Xác nhận mật khẩu" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                                    </div>
-                                    <div className="mb-4">
-                                        <input
-                                            className="form-check-input mx-1"
-                                            type="checkbox"
-                                            checked={agree}
-                                            onChange={() => setAgree(!agree)}
-                                        />
-                                        <label className="form-check-label text-muted" htmlFor="autoNextCheckbox">
-                                            Tôi đồng ý với điều khoản sử dụng
-                                        </label>
-                                    </div>
-                                    <div className="mt-3 d-grid gap-2">
-                                        <button type="submit"
-                                            className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
-                                            disabled={isDisabled}
-                                        >
-                                            {isDisabled ? (
-                                                <>
-                                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                </>
-                                            ) : (
-                                                "Đăng ký"
-                                            )}
-                                        </button>
-                                    </div>
-                                    <div className="text-center mt-4 font-weight-light">Đã có tài khoản ? <Link to="/dang-nhap" className="text-primary">Đăng nhập</Link>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>

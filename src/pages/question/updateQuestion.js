@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../components/layouts/header';
 import NavBar from '../../components/layouts/navBar';
-import Cookies from 'js-cookie'
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../config/axiosConfig';
@@ -11,14 +10,12 @@ export default function UpdateQuestionForm() {
     const [questionText, setQuestionText] = useState('');
     const [answers, setAnswers] = useState(['']);
     const [correctAnswer, setCorrectAnswer] = useState('');
-    const token = Cookies.get('token')
     const { examId, sectionId, questionId } = useParams()
 
 
     const fetchData = async () => {
         try {
             const res = await api.get(`/question/${examId}/${sectionId}/${questionId}`)
-            console.log(res)
             const question = res.data.question
             setQuestionText(question.text)
             setAnswers(question.answers)

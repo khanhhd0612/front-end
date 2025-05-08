@@ -1,9 +1,10 @@
+import "./../../assets/css/auth.css"
 import React, { useState } from 'react'
+import nProgress from 'nprogress'
 import api from "../../config/axiosConfig"
-import Swal from "sweetalert2"
-import NProgress from 'nprogress'
+import Swal from "sweetalert2";
 
-export default function ForgotPassword() {
+export default function Test() {
     const [email, setEmail] = useState('')
     const [isDisabled, setIsDisabled] = useState(false)
 
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
         e.preventDefault()
         setIsDisabled(true)
 
-        NProgress.start()
+        nProgress.start()
         try {
             const res = await api.post(`forgot/password/`, { email })
             if (res.status === 200) {
@@ -31,42 +32,45 @@ export default function ForgotPassword() {
             })
         } finally {
             setIsDisabled(false)
-            NProgress.done()
+            nProgress.done()
         }
     }
-
     return (
-        <div className="container-scroller">
-            <div className="container-fluid page-body-wrapper full-page-wrapper">
-                <div className="content-wrapper d-flex align-items-center auth">
-                    <div className="row flex-grow">
-                        <div className="col-lg-4 mx-auto">
-                            <div className="auth-form-light text-left p-5">
-                                <div className="brand-logo">
-                                    <img src="assets/images/logo.jpg" />
+        <div>
+            <div className="content">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6 d-none d-lg-block">
+                            <img src="/assets/images/undraw_remotely_2j6y.svg" alt="Image" className="img-fluid" />
+                        </div>
+                        <div className="col-md-6 contents">
+                            <div className="p-5">
+                                <div className="row justify-content-center">
+                                    <div className="col-md-8">
+                                        <div className="mb-4">
+                                            <h3>Quên mật khẩu </h3>
+                                        </div>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="mb-3">
+                                                <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
+                                                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                                                    value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                            </div>
+                                            <button type="submit"
+                                                className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                                                disabled={isDisabled}
+                                            >
+                                                {isDisabled ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                    </>
+                                                ) : (
+                                                    "Gửi"
+                                                )}
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <h6 className="font-weight-light">Nhập email của bạn </h6>
-                                <form onSubmit={handleSubmit} className="pt-3">
-                                    <div className="form-group">
-                                        <input type="email" className="form-control form-control-lg" placeholder="Email"
-                                            value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                    </div>
-
-                                    <div className="mt-3 d-grid gap-2">
-                                        <button type="submit"
-                                            className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
-                                            disabled={isDisabled}
-                                        >
-                                            {isDisabled ? (
-                                                <>
-                                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                </>
-                                            ) : (
-                                                "Gửi"
-                                            )}
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>

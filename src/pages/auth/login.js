@@ -1,3 +1,4 @@
+import "./../../assets/css/auth.css"
 import { Link } from "react-router-dom"
 import Cookies from 'js-cookie'
 import React, { useState, useRef, useEffect } from 'react'
@@ -36,50 +37,62 @@ export default function Login() {
             setIsDisabled(false)
         }
     }
-
     return (
-        <div className="container-scroller">
-            <div className="container-fluid page-body-wrapper full-page-wrapper">
-                <div className="content-wrapper d-flex align-items-center auth">
-                    <div className="row flex-grow">
-                        <div className="col-lg-4 mx-auto">
-                            <div className="auth-form-light text-left p-5">
-                                <div className="brand-logo">
-                                    <img src="assets/images/logo.jpg" />
+        <div>
+            <div className="content">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-6 d-none d-lg-block">
+                            <img src="/assets/images/undraw_remotely_2j6y.svg" alt="Image" className="img-fluid" />
+                        </div>
+                        <div className="col-md-6 contents">
+                            <div className="p-5">
+                                <div className="row justify-content-center">
+                                    <div className="col-md-8">
+                                        <div className="mb-4">
+                                            <h3>Đăng nhập </h3>
+                                        </div>
+                                        <form onSubmit={handleLogin}>
+                                            {errorLogin && <p style={{ color: 'red' }}>{errorLogin}</p>}
+                                            {successLogin && <p style={{ color: 'green' }}>{successLogin}</p>}
+                                            <div className="mb-3">
+                                                <label htmlFor="exampleInputEmail1" className="form-label">Email</label>
+                                                <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                                                    value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label htmlFor="exampleInputPassword1" className="form-label">Mật khẩu </label>
+                                                <input type="password" className="form-control" id="exampleInputPassword1"
+                                                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                            </div>
+                                            <button type="submit"
+                                                className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
+                                                disabled={isDisabled}
+                                            >
+                                                {isDisabled ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                    </>
+                                                ) : (
+                                                    "Đăng nhập"
+                                                )}
+                                            </button>
+                                        </form>
+
+                                        <div className="d-flex mb-5 justify-content-between align-items-center mt-4">
+                                            <span className="ml-auto"><Link to="/dang-ky" href="#" className="forgot-pass">Đăng ký </Link></span>
+                                            <span className="ml-auto"><Link to="/quen-mat-khau" href="#" className="forgot-pass">Quên mật khẩu </Link></span>
+                                        </div>
+
+                                        <span className="d-block text-left my-4 text-muted">&mdash; hoặc đăng nhập với  &mdash;</span>
+
+                                        <div className="social-login">
+                                            <a href="#" className="facebook">
+                                                <span className="fa fa-facebook mr-3"></span>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h6 className="font-weight-light">Đăng nhập để tiếp tục</h6>
-                                <form onSubmit={handleLogin} className="pt-3">
-                                    {errorLogin && <p style={{ color: 'red' }}>{errorLogin}</p>}
-                                    {successLogin && <p style={{ color: 'green' }}>{successLogin}</p>}
-                                    <div className="form-group">
-                                        <input type="email" className="form-control form-control-lg" placeholder="Email"
-                                            value={email} onChange={(e) => setEmail(e.target.value)} required />
-                                    </div>
-                                    <div className="form-group">
-                                        <input type="password" className="form-control form-control-lg" placeholder="Mật khẩu"
-                                            value={password} onChange={(e) => setPassword(e.target.value)} required />
-                                    </div>
-                                    <div className="mt-3 d-grid gap-2">
-                                        <button type="submit"
-                                            className="btn btn-block btn-gradient-primary btn-lg font-weight-medium auth-form-btn"
-                                            disabled={isDisabled}
-                                        >
-                                            {isDisabled ? (
-                                                <>
-                                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                </>
-                                            ) : (
-                                                "Đăng nhập"
-                                            )}
-                                        </button>
-                                    </div>
-                                    <div className="my-2 d-flex justify-content-between align-items-center">
-                                        <Link to="/quen-mat-khau" className="auth-link text-primary">Quên mật khẩu?</Link>
-                                    </div>
-                                    <div className="text-center mt-4 font-weight-light">
-                                        Không có tài khoản? <Link to="/dang-ky" className="text-primary">Đăng ký</Link>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>
