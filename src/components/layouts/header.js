@@ -121,7 +121,7 @@ export default function Header() {
                         </li>
                     ) : (
                         <li>
-                            <button className="btn">Bạn chưa đăng nhập</button>
+                            <p className="d-inline p-3 ">Bạn chưa đăng nhập</p>
                             <Link to="/dang-nhap" className="btn btn-primary">Đăng nhập</Link>
                         </li>
                     )}
