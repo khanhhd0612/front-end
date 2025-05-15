@@ -1,73 +1,68 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import React, { useEffect, useRef, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import Cookies from "js-cookie"
 
 export default function Header() {
-    const navigate = useNavigate();
-    const [query, setQuery] = useState('');
-    const [isLogin, setIsLogin] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const navigate = useNavigate()
+    const [query, setQuery] = useState('')
+    const [isLogin, setIsLogin] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-    const dropdownRef = useRef(null);
-    const sidebarRef = useRef(null);
+    const dropdownRef = useRef(null)
 
     useEffect(() => {
-        const token = Cookies.get("token");
-        setIsLogin(!!token);
-    }, []);
+        const token = Cookies.get("token")
+        setIsLogin(!!token)
+    }, [])
 
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-                setIsDropdownOpen(false);
+                setIsDropdownOpen(false)
             }
-            if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
-                setIsSidebarOpen(false);
-                document.getElementById('sidebar')?.classList.remove('active');
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
+        }
+        document.addEventListener("mousedown", handleClickOutside)
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [])
 
     const handleSearch = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         if (query) {
-            navigate(`/tim-kiem?q=${query}`);
+            navigate(`/tim-kiem?q=${query}`)
         }
-    };
+    }
 
     const handleLogout = () => {
-        Cookies.remove("token");
-        window.location = "/dang-nhap";
-    };
+        Cookies.remove("token")
+        window.location = "/dang-nhap"
+    }
 
     const handleClickFullScreen = () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch((err) => {
-                console.error(`Lỗi khi bật full screen: ${err.message}`);
-            });
+                console.error(`Lỗi khi bật full screen: ${err.message}`)
+            })
         } else {
-            document.exitFullscreen();
+            document.exitFullscreen()
         }
-    };
+    }
 
     const toggleClick = () => {
-        const body = document.body;
-        body.classList.toggle("sidebar-icon-only");
-    };
+        const body = document.body
+        body.classList.toggle("sidebar-icon-only")
+    }
 
     const handleClickNavBar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-        document.getElementById('sidebar')?.classList.toggle('active');
-    };
+        setIsSidebarOpen(!isSidebarOpen)
+        document.getElementById('sidebar')?.classList.toggle('active')
+    }
 
     const handleClickUser = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+        setIsDropdownOpen(!isDropdownOpen)
+    }
 
     return (
         <nav className="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -135,9 +130,7 @@ export default function Header() {
                     onClick={handleClickNavBar}>
                     <span className="mdi mdi-menu"></span>
                 </button>
-                <div ref={sidebarRef}>
-                </div>
             </div>
         </nav>
-    );
+    )
 }

@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import FormCard from "./formCard";
 
 export default function ExamCard({ id, name, slug, time, createdBy }) {
+    const [showModal, setShowModal] = useState(false);
     return (
         <div className="card card-img-holder">
             <img className="p-1" src="/assets/images/background-hoc-tap-54.jpg" alt="default-img" />
@@ -16,7 +18,14 @@ export default function ExamCard({ id, name, slug, time, createdBy }) {
                         </div>
                     </div>
                 </div>
-                <Link to={`/bai-thi/${slug}/${id}`} className="btn btn-primary mt-2">Ôn tập</Link>
+                <button className="btn btn-primary mt-2" onClick={() => setShowModal(true)}>
+                    Ôn tập
+                </button>
+                {showModal && <FormCard
+                    onClose={() => setShowModal(false)}
+                    slug={slug}
+                    id={id}
+                />}
             </div>
         </div>
     )

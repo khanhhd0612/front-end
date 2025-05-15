@@ -1,104 +1,118 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import Header from "../../components/layouts/header";
-import api from '../../config/axiosConfig';
-import nProgress from 'nprogress';
+import { useEffect, useState, useRef } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import Swal from 'sweetalert2'
+import Header from "../../components/layouts/header"
+import api from '../../config/axiosConfig'
+import nProgress from 'nprogress'
 
-const shuffleArray = (array) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-};
 
 const DoExam = () => {
-    const navigate = useNavigate();
-    const [questions, setQuestions] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [examTitle, setExamTitle] = useState('');
-    const { id } = useParams();
-    const [time, setTime] = useState(0);
-    const [autoNext, setAutoNext] = useState(true);
-    const timerRef = useRef(null);
+    const navigate = useNavigate()
+    const location = useLocation()
+    const { shuffleAnswer, shuffleQuestion, autoTime } = location.state || {}
+    const [questions, setQuestions] = useState([])
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [examTitle, setExamTitle] = useState('')
+    const { id } = useParams()
+    const [time, setTime] = useState(0)
+    const [autoNext, setAutoNext] = useState(true)
+    const timerRef = useRef(null)
+
+    const shuffleArray = (array = []) => {
+        const shuffled = [...array]
+        if (shuffleAnswer) {
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1))
+                    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+            }
+        }
+        return shuffled
+    }
+
+
 
     useEffect(() => {
         nProgress.start()
         api.get(`/exam/${id}`)
             .then(res => {
-                const data = res.data;
-                setExamTitle(data.name || "Đề thi không có tên");
-                const loadedQuestions = data.sections.flatMap(section => section.questions);
-                const initializedQuestions = loadedQuestions.map(q => ({
+                const data = res.data
+                setExamTitle(data.name || "Đề thi không có tên")
+                const loadedQuestions = data.sections.flatMap(section => section.questions)
+                let processedQuestions = loadedQuestions.map(q => ({
                     ...q,
                     answers: shuffleArray(q.answers),
                     selectedAnswer: null,
                     answered: false
-                }));
-                setQuestions(initializedQuestions);
+                }))
+
+                if (shuffleQuestion) {
+                    processedQuestions = shuffleArray(processedQuestions)
+                }
+
+                setQuestions(processedQuestions)
+                if (autoTime === 0) {
+                    setAutoNext(false)
+                }
             })
             .catch(err => {
                 console.log(err)
-                if (err.response.status === 500){
-                    navigate('/500');
+                if (err.response.status === 500) {
+                    navigate('/500')
                 }
-            }).finally(()=>{
+            }).finally(() => {
                 nProgress.done()
-            });
-    }, [id]);
+            })
+    }, [id])
 
     const handleAnswer = (answer) => {
-        const updatedQuestions = [...questions];
-        const currentQ = updatedQuestions[currentIndex];
+        const updatedQuestions = [...questions]
+        const currentQ = updatedQuestions[currentIndex]
         if (!currentQ.answered) {
-            currentQ.selectedAnswer = answer;
-            currentQ.answered = true;
+            currentQ.selectedAnswer = answer
+            currentQ.answered = true
         }
-        setQuestions(updatedQuestions);
-
+        setQuestions(updatedQuestions)
         if (autoNext) {
             setTimeout(() => {
-                setCurrentIndex(prev => Math.min(prev + 1, questions.length - 1));
-            }, 2000);
+                setCurrentIndex(prev => Math.min(prev + 1, questions.length - 1))
+            }, 2000)
         }
-    };
+    }
 
-    const currentQ = questions[currentIndex];
-    const totalAnswered = questions.filter(q => q.answered).length;
-    const totalCorrect = questions.filter(q => q.correctAnswers.includes(q.selectedAnswer)).length;
-    const fixWrongQuestions = questions.filter(q => q.answered && !q.correctAnswers.includes(q.selectedAnswer));
+    const currentQ = questions[currentIndex]
+    const totalAnswered = questions.filter(q => q.answered).length
+    const totalCorrect = questions.filter(q => q.correctAnswers.includes(q.selectedAnswer)).length
+    const fixWrongQuestions = questions.filter(q => q.answered && !q.correctAnswers.includes(q.selectedAnswer))
 
     const handleRetryWrong = () => {
-        const wrongQuestions = questions.filter(q => q.answered && !q.correctAnswers.includes(q.selectedAnswer));
+        const wrongQuestions = questions.filter(q => q.answered && !q.correctAnswers.includes(q.selectedAnswer))
         const resetWrong = wrongQuestions.map(q => ({
             ...q,
             selectedAnswer: null,
             answered: false
-        }));
-        setQuestions(resetWrong);
-        setCurrentIndex(0);
-    };
+        }))
+        setQuestions(resetWrong)
+        setCurrentIndex(0)
+    }
 
     useEffect(() => {
         timerRef.current = setInterval(() => {
-            setTime(prev => prev + 1);
-        }, 1000);
+            setTime(prev => prev + 1)
+        }, 1000)
 
-        return () => clearInterval(timerRef.current);
-    }, []);
+        return () => clearInterval(timerRef.current)
+    }, [])
 
     const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m} : ${s < 10 ? '0' + s : s}`;
-    };
+        const m = Math.floor(seconds / 60)
+        const s = seconds % 60
+        return `${m} : ${s < 10 ? '0' + s : s}`
+    }
 
     useEffect(() => {
         if (questions.length > 0 && totalAnswered === questions.length) {
-            clearInterval(timerRef.current);
-            const percent = ((totalCorrect / questions.length) * 100).toFixed(2);
+            clearInterval(timerRef.current)
+            const percent = ((totalCorrect / questions.length) * 100).toFixed(2)
             Swal.fire({
                 title: 'Đã hoàn thành bài thi!',
                 html: `
@@ -108,9 +122,9 @@ const DoExam = () => {
                 `,
                 icon: 'success',
                 confirmButtonText: 'OK'
-            });
+            })
         }
-    }, [totalAnswered, totalCorrect, questions.length]);
+    }, [totalAnswered, totalCorrect, questions.length])
 
     return (
         <div className="position-absolute top-0 right-0 left-0 bottom-0 page-bg w-100">
@@ -173,13 +187,13 @@ const DoExam = () => {
                                     <div className="question-container">
                                         <div className="options">
                                             {currentQ?.answers.map((ans, i) => {
-                                                let isCorrect = currentQ.correctAnswers.includes(ans);
-                                                let isSelected = currentQ.selectedAnswer === ans;
-                                                let className = "w-100 p-2 mt-2 border btn text-start";
+                                                let isCorrect = currentQ.correctAnswers.includes(ans)
+                                                let isSelected = currentQ.selectedAnswer === ans
+                                                let className = "w-100 p-2 mt-2 border btn text-start"
                                                 if (currentQ.answered) {
-                                                    if (isSelected && isCorrect) className = "w-100 p-1 btn btn-success text-white text-start";
-                                                    else if (isSelected && !isCorrect) className = "w-100 p-2 mt-2 btn btn-danger text-white text-start";
-                                                    else if (!isSelected && isCorrect) className = "w-100 p-2 mt-2 btn btn-success text-white text-start";
+                                                    if (isSelected && isCorrect) className = "w-100 p-1 btn btn-success text-white text-start"
+                                                    else if (isSelected && !isCorrect) className = "w-100 p-2 mt-2 btn btn-danger text-white text-start"
+                                                    else if (!isSelected && isCorrect) className = "w-100 p-2 mt-2 btn btn-success text-white text-start"
                                                 }
                                                 return (
                                                     <button
@@ -190,7 +204,7 @@ const DoExam = () => {
                                                     >
                                                         {ans}
                                                     </button>
-                                                );
+                                                )
                                             })}
                                         </div>
                                     </div>
@@ -206,14 +220,14 @@ const DoExam = () => {
                                 <div className="card-content">
                                     <div className='exam-list-questions'>
                                         {questions.map((q, i) => {
-                                            let btnClass = "m-1 question-btn ";
+                                            let btnClass = "m-1 question-btn "
                                             if (q.answered) {
                                                 btnClass += q.correctAnswers.includes(q.selectedAnswer)
-                                                    ? "btn-success" : "btn-danger";
+                                                    ? "btn-success" : "btn-danger"
                                             } else {
-                                                btnClass += "btn-outline-primary";
+                                                btnClass += "btn-outline-primary"
                                             }
-                                            if (currentIndex === i) btnClass += " active";
+                                            if (currentIndex === i) btnClass += " active"
 
                                             return (
                                                 <button
@@ -223,7 +237,7 @@ const DoExam = () => {
                                                 >
                                                     {i + 1}
                                                 </button>
-                                            );
+                                            )
                                         })}
                                     </div>
                                     <div className="d-flex justify-content-between mt-2 border-top py-2">
@@ -250,7 +264,7 @@ const DoExam = () => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default DoExam;
+export default DoExam

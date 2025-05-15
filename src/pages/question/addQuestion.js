@@ -103,13 +103,12 @@ export default function AddQuestionForm() {
                                         <h4 className="card-title">Thêm câu hỏi </h4>
                                         <div className="form-group">
                                             <label htmlFor="exampleInputName1">Câu hỏi </label>
-                                            <input
-                                                type="text"
+                                            <textarea
                                                 placeholder="Nhập câu hỏi"
                                                 className="form-control"
                                                 value={questionText}
                                                 onChange={(e) => setQuestionText(e.target.value)}
-                                            />
+                                            ></textarea>
                                         </div>
                                         <div>
                                             <div><label>Đáp án </label></div>
