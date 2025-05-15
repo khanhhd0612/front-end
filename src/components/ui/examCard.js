@@ -11,7 +11,7 @@ export default function ExamCard({ id, name, slug, time, createdBy }) {
                         <p>{time.slice(0, 10)}</p>
                         <div className="d-flex align-items-center">
                             <img className="rounded-circle logo-user-update-exam"
-                                src="assets/images/user_img.jpg" alt="user" />
+                                src="/assets/images/user_img.jpg" alt="user" />
                             <div className="">{createdBy}</div>
                         </div>
                     </div>

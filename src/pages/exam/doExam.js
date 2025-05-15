@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Header from "../../components/layouts/header";
 import api from '../../config/axiosConfig';
+import nProgress from 'nprogress';
 
 const shuffleArray = (array) => {
     const shuffled = [...array];
@@ -24,6 +25,7 @@ const DoExam = () => {
     const timerRef = useRef(null);
 
     useEffect(() => {
+        nProgress.start()
         api.get(`/exam/${id}`)
             .then(res => {
                 const data = res.data;
@@ -42,6 +44,8 @@ const DoExam = () => {
                 if (err.response.status === 500){
                     navigate('/500');
                 }
+            }).finally(()=>{
+                nProgress.done()
             });
     }, [id]);
 
