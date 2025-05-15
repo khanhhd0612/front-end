@@ -8,19 +8,20 @@ import api from "../../config/axiosConfig"
 export default function ListSection() {
     const navigate = useNavigate();
     const [data, setData] = useState([])
+    const [isPublic, setIsPublic] = useState(true)
     const [nameExam, setNameExam] = useState('')
     const [originalName, setOriginalName] = useState('')
     const [nameSection, setNameSection] = useState('')
     const { examId } = useParams()
 
     const fetchData = async () => {
-        try{
+        try {
             const res = await api.get(`/exam/${examId}/sections`)
             setNameExam(res.data.exam)
             setOriginalName(res.data.exam)
             setData(res.data.section)
-        }catch(err){
-            if (err.response?.status === 500){
+        } catch (err) {
+            if (err.response?.status === 500) {
                 navigate('/500');
             }
         }
@@ -73,7 +74,7 @@ export default function ListSection() {
                 }
             )
             if (res.status === 200) {
-                Swal.fire({ title: "Đổi tên thành công", icon: "success" })
+                Swal.fire({ title: res.data.message, icon: "success" })
             }
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
@@ -87,27 +88,45 @@ export default function ListSection() {
     const addSection = async () => {
         try {
             const validateName = nameSection.trim()
-    
+
             if (!validateName) {
                 Swal.fire({ title: "Tên phần thi không được để trống", icon: "warning" })
                 return
             }
-    
+
             const res = await api.post(`/exam/${examId}/sections`,
                 { name: validateName }
             )
-    
+
             if (res.status === 200) {
-                Swal.fire({ title: "Thêm phần thi thành công", icon: "success" })
+                Swal.fire({ title: res.data.message, icon: "success" })
                 setNameSection('')
                 fetchData()
             }
-    
+
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 Swal.fire("Lỗi", err.response.data.message, "error")
             } else {
                 Swal.fire("Lỗi", "Đã xảy ra lỗi khi thêm phần thi", "error")
+            }
+        }
+    }
+    const handleChangePrivacy = async () => {
+        try {
+            const res = await api.put(`/update/exam/${examId}`,
+                {
+                    isPublic: isPublic
+                }
+            )
+            if (res.status === 200) {
+                Swal.fire({ title: res.data.message, icon: "success" })
+            }
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                Swal.fire("Lỗi", err.response.data.message, "error")
+            } else {
+                Swal.fire("Lỗi", "Đã xảy ra lỗi khi đổi tên bài thi", "error")
             }
         }
     }
@@ -133,11 +152,29 @@ export default function ListSection() {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td><input className="border p-2 w-100" type="text" value={nameExam} onChange={(e) => { setNameExam(e.target.value) }} /></td>
+                                                    <td><input className="border rounded p-2 w-100" type="text" value={nameExam} onChange={(e) => { setNameExam(e.target.value) }} /></td>
                                                     <td><label onClick={handleReNameExam} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
                                                 </tr>
+                                                <tr>
+                                                    <td><div className="input-group mb-3 mt-3">
+                                                        <label className="input-group-text" htmlFor="inputGroupSelect01">Quyền riêng tư </label>
+                                                        <select
+                                                            value={isPublic.toString()}
+                                                            onChange={(e) => setIsPublic(e.target.value === 'true')}
+                                                            className="form-select"
+                                                            id="inputGroupSelect01"
+                                                        >
+                                                            <option value="true">Công khai</option>
+                                                            <option value="false">Chỉ mình tôi </option>
+                                                        </select>
+                                                    </div>
+                                                    </td>
+                                                    <td><label onClick={handleChangePrivacy} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
+                                                </tr>
                                             </tbody>
+
                                         </table>
+
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +191,7 @@ export default function ListSection() {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td><input className="border p-2 w-100" type="text" placeholder="Nhập tên phần thi" required value={nameSection} onChange={(e) => { setNameSection(e.target.value) }} /></td>
+                                                    <td><input className="border rounded p-2 w-100" type="text" placeholder="Nhập tên phần thi" required value={nameSection} onChange={(e) => { setNameSection(e.target.value) }} /></td>
                                                     <td><label onClick={addSection} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
                                                 </tr>
                                             </tbody>
