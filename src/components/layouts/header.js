@@ -103,11 +103,7 @@ export default function Header() {
                 <ul className="navbar-nav navbar-nav-right">
                     {isLogin ? (
                         <li className="nav-item nav-profile dropdown" ref={dropdownRef}>
-<<<<<<< HEAD
                             <button className="nav-link" id="profileDropdown" onClick={handleClickUser}>
-=======
-                            <a className="nav-link" id="profileDropdown" onClick={handleClickUser}>
->>>>>>> 0b15950af15443a8772586dceda432db2f277387
                                 <div className="nav-profile-img">
                                     <img src={process.env.PUBLIC_URL + "/assets/images/user_img.png"} alt="user" />
                                     <span className="availability-status online"></span>
@@ -124,14 +120,11 @@ export default function Header() {
                         </li>
                     ) : (
                         <li>
-<<<<<<< HEAD
                             <p className="p-3 d-none d-md-inline">Bạn chưa đăng nhập</p>
-=======
-                            <p className="d-xs-none d-md-inline p-3 ">Bạn chưa đăng nhập</p>
->>>>>>> 0b15950af15443a8772586dceda432db2f277387
                             <Link to="/dang-nhap" className="btn btn-primary">Đăng nhập</Link>
                         </li>
-                    )}
+                    )
+                    }
                     <li className="nav-item d-none d-lg-block full-screen-link">
                         <button className="nav-link">
                             <i className="mdi mdi-fullscreen" onClick={handleClickFullScreen}></i>
@@ -145,7 +138,6 @@ export default function Header() {
                 <div ref={sidebarRef}>
                 </div>
             </div>
-
         </nav>
     );
 }
