@@ -7,6 +7,7 @@ import api from '../../config/axiosConfig';
 export default function AddExam() {
     const [nameExam, setNameExam] = useState('');
     const [rawInput, setRawInput] = useState('');
+    const [isPublic, setIsPublic] = useState(true);
     const [results, setResults] = useState(null);
     const [parsedHtml, setParsedHtml] = useState('');
     const [loading, setLoading] = useState(false);
@@ -117,6 +118,7 @@ export default function AddExam() {
             setLoading(true);
             const response = await api.post(`/exam`, {
                 name: nameExam,
+                isPublic,
                 sections: results.sections,
             });
 
@@ -208,8 +210,21 @@ export default function AddExam() {
                                             value={nameExam}
                                             onChange={(e) => setNameExam(e.target.value)}
                                         />
+                                        <div className="input-group mb-3 mt-3">
+                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Quyền riêng tư </label>
+                                            <select
+                                                value={isPublic.toString()}
+                                                onChange={(e) => setIsPublic(e.target.value === 'true')}
+                                                className="form-select"
+                                                id="inputGroupSelect01"
+                                            >
+                                                <option value="true">Công khai</option>
+                                                <option value="false">Chỉ mình tôi </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
+
 
                                 <div className="card mt-3">
                                     <div className="card-header bg-primary text-white">Nhập dữ liệu câu hỏi</div>

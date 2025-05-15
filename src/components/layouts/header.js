@@ -103,7 +103,7 @@ export default function Header() {
                 <ul className="navbar-nav navbar-nav-right">
                     {isLogin ? (
                         <li className="nav-item nav-profile dropdown" ref={dropdownRef}>
-                            <a className="nav-link dropdown-toggle" id="profileDropdown" onClick={handleClickUser}>
+                            <a className="nav-link" id="profileDropdown" onClick={handleClickUser}>
                                 <div className="nav-profile-img">
                                     <img src={process.env.PUBLIC_URL + "/assets/images/user_img.png"} alt="user" />
                                     <span className="availability-status online"></span>
@@ -113,7 +113,6 @@ export default function Header() {
                                 <Link to="/thong-tin-nguoi-dung" className="dropdown-item">
                                     <i className="mdi mdi-cached me-2 text-success"></i> Hồ sơ
                                 </Link>
-                                <div className="dropdown-divider"></div>
                                 <button onClick={handleLogout} className="dropdown-item">
                                     <i className="mdi mdi-logout me-2 text-primary"></i> Đăng xuất
                                 </button>
@@ -121,7 +120,7 @@ export default function Header() {
                         </li>
                     ) : (
                         <li>
-                            <p className="d-inline p-3 ">Bạn chưa đăng nhập</p>
+                            <p className="d-xs-none d-md-inline p-3 ">Bạn chưa đăng nhập</p>
                             <Link to="/dang-nhap" className="btn btn-primary">Đăng nhập</Link>
                         </li>
                     )}
