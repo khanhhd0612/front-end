@@ -20,11 +20,9 @@ const DoExam = () => {
 
     const shuffleArray = (array = []) => {
         const shuffled = [...array]
-        if (shuffleAnswer) {
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1))
-                    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-            }
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+                ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
         }
         return shuffled
     }
@@ -55,7 +53,6 @@ const DoExam = () => {
                 }
             })
             .catch(err => {
-                console.log(err)
                 if (err.response.status === 500) {
                     navigate('/500')
                 }
@@ -108,21 +105,37 @@ const DoExam = () => {
         const s = seconds % 60
         return `${m} : ${s < 10 ? '0' + s : s}`
     }
+    const saveScore = async (score, time) => {
+        try {
+            const examId = id
+            const res = api.post(`score`, {
+                examId,
+                score,
+                time
+            })
+        } catch (err) {
+            Swal.fire({
+                title: err,
+                icon: 'error',
+            })
+        }
+    }
 
     useEffect(() => {
         if (questions.length > 0 && totalAnswered === questions.length) {
             clearInterval(timerRef.current)
-            const percent = ((totalCorrect / questions.length) * 100).toFixed(2)
+            const score = ((totalCorrect / questions.length) * 10).toFixed(2)
             Swal.fire({
                 title: 'Đã hoàn thành bài thi!',
                 html: `
                     <p>Số câu đúng: <b>${totalCorrect}/${questions.length}</b></p>
-                    <p>Điểm: <b>${percent}%</b></p>
+                    <p>Điểm: <b>${score}</b></p>
                     <p>Thời gian làm bài: <b>${formatTime(time)}</b></p>
                 `,
                 icon: 'success',
                 confirmButtonText: 'OK'
             })
+            saveScore(score, time)
         }
     }, [totalAnswered, totalCorrect, questions.length])
 

@@ -2,7 +2,10 @@ import { useState } from "react";
 import FormCard from "./formCard";
 
 export default function ExamCard({ id, name, slug, time, createdBy }) {
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false)
+
+ 
+
     return (
         <div className="card card-img-holder">
             <img className="p-1" src="/assets/images/background-hoc-tap-54.jpg" alt="default-img" />

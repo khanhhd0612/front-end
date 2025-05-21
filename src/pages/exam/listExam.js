@@ -99,6 +99,7 @@ export default function ListExam() {
                                                                 <td>{item.sections.length}</td>
                                                                 <td>{item.createdAt.slice(0, 10)}</td>
                                                                 <td>
+                                                                    <Link to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link>
                                                                     <Link to={`/edit/exam/${item._id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
                                                                     <label onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
                                                                 </td>

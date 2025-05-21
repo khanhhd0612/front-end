@@ -1,6 +1,6 @@
 import "./../../assets/css/auth.css"
-import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from "../../config/axiosConfig"
 import nProgress from 'nprogress';

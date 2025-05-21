@@ -15,6 +15,9 @@ import UpdateQuestionForm from '../pages/question/updateQuestion';
 import AddQuestionForm from '../pages/question/addQuestion';
 import ForgotPassword from '../pages/auth/forgotPassword';
 import ResetPassword from '../pages/auth/resetPassword';
+import ListScore from '../pages/score/listScore';
+import TestExam from '../pages/exam/testExam';
+import InfomationExam from '../pages/exam/examInfo';
 
 const routes = [
   {
@@ -35,7 +38,15 @@ const routes = [
   },
   {
     path: '/bai-thi/:slug/:id',
+    element: <CheckLogin><InfomationExam /></CheckLogin>,
+  },
+  {
+    path: '/bai-thi/on-thi/:slug/:id',
     element: <CheckLogin><DoExam /></CheckLogin>,
+  },
+  {
+    path: '/bai-thi/thi-thu/:slug/:id',
+    element: <CheckLogin><TestExam /></CheckLogin>,
   },
   {
     path: '/tim-kiem',
@@ -64,6 +75,10 @@ const routes = [
   {
     path: '/edit/exam/:examId/sections',
     element: <CheckLogin><ListSection /></CheckLogin>,
+  },
+  {
+    path: '/score/exam/:examId',
+    element: <CheckLogin><ListScore /></CheckLogin>,
   },
   {
     path: '/edit/exam/:examId/section/:sectionId/questions',

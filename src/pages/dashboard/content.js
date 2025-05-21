@@ -13,7 +13,7 @@ export default function ContentDashBoard() {
         nProgress.start()
         try {
             const response = await api.get(`/exam?page=${page}&limit=8`)
-            const newData = response.data
+            const newData = response.data.exam
             if (newData.length === 0) {
                 setHasMore(false)
             } else {
