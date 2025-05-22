@@ -8,12 +8,13 @@ import nProgress from 'nprogress'
 const TestExam = () => {
     const navigate = useNavigate()
     const location = useLocation()
-    const { shuffleAnswer, shuffleQuestion, autoTime } = location.state || {}
+    const { autoTime } = location.state || {}
     const [questions, setQuestions] = useState([])
     const [currentIndex, setCurrentIndex] = useState(0)
     const [examTitle, setExamTitle] = useState('')
     const { id } = useParams()
-    const [time, setTime] = useState(0)
+    const [time, setTime] = useState(1)
+    const [timeLimit, setTimeLimit] = useState(0)
     const [autoNext, setAutoNext] = useState(true)
     const [isSubmitted, setIsSubmitted] = useState(false)
     const timerRef = useRef(null)
@@ -33,6 +34,7 @@ const TestExam = () => {
             .then(res => {
                 const data = res.data
                 setExamTitle(data.name || "Đề thi không có tên")
+                setTimeLimit(data.timeLimit || 30)
                 let loadedQuestions = data.sections.flatMap(section => section.questions)
                 let processedQuestions = loadedQuestions.map(q => ({
                     ...q,
@@ -51,9 +53,36 @@ const TestExam = () => {
     }, [id])
 
     useEffect(() => {
-        timerRef.current = setInterval(() => setTime(prev => prev + 1), 1000)
-        return () => clearInterval(timerRef.current)
-    }, [])
+        if (!timeLimit) return; // đảm bảo timeLimit có giá trị > 0
+
+        setTime(timeLimit * 60);
+        setIsSubmitted(false);
+
+    }, [timeLimit]);
+
+    useEffect(() => {
+        if (time === null || isSubmitted) return;
+
+        if (time <= 0) {
+            clearInterval(timerRef.current);
+            if (!isSubmitted) {
+                handleSubmitExam();
+            }
+            return;
+        }
+
+        timerRef.current = setInterval(() => {
+            setTime(prev => {
+                if (prev <= 1) {
+                    clearInterval(timerRef.current);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(timerRef.current);
+    }, [time, isSubmitted]);
 
     const handleAnswer = (answer) => {
         const updatedQuestions = [...questions]
@@ -95,7 +124,12 @@ const TestExam = () => {
         setIsSubmitted(true)
 
         const totalCorrect = questions.filter(q => q.correctAnswers.includes(q.selectedAnswer)).length
-        const score = ((totalCorrect / questions.length) * 10).toFixed(2)
+        let score
+        if (totalCorrect > 1) {
+            score = ((totalCorrect / questions.length) * 10).toFixed(2)
+        } else {
+            score = 0
+        }
 
         Swal.fire({
             title: 'Đã nộp bài!',

@@ -3,14 +3,17 @@ import Swal from 'sweetalert2';
 import Header from '../../components/layouts/header';
 import NavBar from '../../components/layouts/navBar';
 import api from '../../config/axiosConfig';
+import nProgress from 'nprogress';
 
 export default function AddExam() {
     const [nameExam, setNameExam] = useState('');
     const [rawInput, setRawInput] = useState('');
+    const [timeLimit, setTimeLimit] = useState('');
     const [isPublic, setIsPublic] = useState(true);
     const [results, setResults] = useState(null);
     const [parsedHtml, setParsedHtml] = useState('');
     const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState(null); // NEW
 
     const parseQuestions = (text) => {
         const lines = text.split('\n');
@@ -116,10 +119,21 @@ export default function AddExam() {
 
         try {
             setLoading(true);
-            const response = await api.post(`/exam`, {
-                name: nameExam,
-                isPublic,
-                sections: results.sections,
+            nProgress.start()
+
+            const formData = new FormData();
+            formData.append('name', nameExam);
+            formData.append('isPublic', isPublic);
+            formData.append('timeLimit', timeLimit);
+            formData.append('sections', JSON.stringify(results.sections));
+            if (image) {
+                formData.append('image', image);
+            }
+
+            const response = await api.post(`/exam`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
             if (response.status === 201) {
@@ -128,18 +142,19 @@ export default function AddExam() {
                     icon: "success",
                     draggable: true
                 });
-                setNameExam('')
-                setRawInput('')
-                setResults('')
-                setParsedHtml('')
+                setNameExam('');
+                setRawInput('');
+                setResults(null);
+                setParsedHtml('');
+                setImage(null);
             } else {
                 alert('Có lỗi xảy ra khi xuất đề!');
             }
         } catch (err) {
-            console.error(err);
             alert('Không thể kết nối tới máy chủ!');
         } finally {
             setLoading(false);
+            nProgress.done()
         }
     };
 
@@ -162,18 +177,18 @@ export default function AddExam() {
         results.sections.forEach((section) => {
             if (section.questions.length > 0) {
                 html += `<div class="card mb-4 border">
-          <div class="card-header  bg-secondary text-white">${section.name}</div>
-          <div class="card-body">`;
+                    <div class="card-header bg-secondary text-white">${section.name}</div>
+                    <div class="card-body">`;
 
                 section.questions.forEach((q) => {
                     total++;
                     html += `<div class="card border question-card mb-3"><div class="card-body">
-            <h6>Câu ${total}: ${q.text}</h6><ul class="list-group">`;
+                        <h6>Câu ${total}: ${q.text}</h6><ul class="list-group">`;
                     q.answers.forEach((ans) => {
                         const isCorrect = q.correctAnswers.includes(ans);
                         html += `<li class="list-group-item ${isCorrect ? 'bg-success text-white' : ''}">
-              ${isCorrect ? '✅ ' : ''}${ans}
-            </li>`;
+                            ${isCorrect ? '✅ ' : ''}${ans}
+                            </li>`;
                     });
                     html += '</ul></div></div>';
                 });
@@ -205,15 +220,23 @@ export default function AddExam() {
                                     <div className="card-body">
                                         <input
                                             type="text"
-                                            className="form-control"
+                                            className="form-control rounded"
                                             placeholder="Nhập tên đề thi"
                                             value={nameExam}
                                             onChange={(e) => setNameExam(e.target.value)}
                                         />
+
+                                        <input
+                                            type="file"
+                                            className="form-control rounded mt-3"
+                                            accept="image/*"
+                                            onChange={(e) => setImage(e.target.files[0])}
+                                        />
+
                                         <div className="input-group mb-3 mt-3">
                                             <label className="input-group-text" htmlFor="inputGroupSelect01">Quyền riêng tư </label>
                                             <select
-                                                value={isPublic.toString()}
+                                                value={isPublic}
                                                 onChange={(e) => setIsPublic(e.target.value === 'true')}
                                                 className="form-select"
                                                 id="inputGroupSelect01"
@@ -222,9 +245,24 @@ export default function AddExam() {
                                                 <option value="false">Chỉ mình tôi </option>
                                             </select>
                                         </div>
+                                        <div className="input-group mb-3 mt-3">
+                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Giới hạn thời gian </label>
+                                            <select
+                                                value={timeLimit}
+                                                onChange={(e) => setTimeLimit(e.target.value)}
+                                                className="form-select"
+                                                id="inputGroupSelect01"
+                                            >
+                                                <option value="10">10 phút</option>
+                                                <option value="15">15 phút</option>
+                                                <option value="30">30 phút</option>
+                                                <option value="60">60 phút</option>
+                                                <option value="90">90 phút</option>
+                                                <option value="120">120 phút</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-
 
                                 <div className="card mt-3">
                                     <div className="card-header bg-primary text-white">Nhập dữ liệu câu hỏi</div>
@@ -232,22 +270,7 @@ export default function AddExam() {
                                         <textarea
                                             className="form-control"
                                             rows="15"
-                                            placeholder="Nhập dữ liệu câu hỏi theo quy tắc sau:
-                                    Câu 1: câu hỏi số 1:
-                                        *a. Đáp án đúng
-                                        b. Đáp án 2
-                                        c. Đáp án 3
-                                        d. Đáp án 4
-
-                                        <dấu cách>
-                                        Câu 2:  câu hỏi số 2:
-                                        *a. 3
-                                        b. 4
-                                        c. 2
-                                        d. 5
-
-                                        Lưu ý: Câu hỏi hoặc câu trả lời phải viết trên cùng 1 dòng
-                                                                        "
+                                            placeholder="Nhập dữ liệu câu hỏi..."
                                             value={rawInput}
                                             onChange={(e) => setRawInput(e.target.value)}
                                         ></textarea>
@@ -281,5 +304,5 @@ export default function AddExam() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

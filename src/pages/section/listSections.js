@@ -9,8 +9,8 @@ export default function ListSection() {
     const navigate = useNavigate();
     const [data, setData] = useState([])
     const [isPublic, setIsPublic] = useState(true)
+    const [timeLimit, setTimeLimit] = useState(1)
     const [nameExam, setNameExam] = useState('')
-    const [originalName, setOriginalName] = useState('')
     const [nameSection, setNameSection] = useState('')
     const { examId } = useParams()
 
@@ -18,7 +18,6 @@ export default function ListSection() {
         try {
             const res = await api.get(`/exam/${examId}/sections`)
             setNameExam(res.data.exam)
-            setOriginalName(res.data.exam)
             setData(res.data.section)
         } catch (err) {
             if (err.response?.status === 500) {
@@ -64,13 +63,11 @@ export default function ListSection() {
     }
     const handleReNameExam = async () => {
         try {
-            if (nameExam.trim() === originalName.trim()) {
-                Swal.fire({ title: "Tên chưa thay đổi", icon: "info" })
-                return;
-            }
             const res = await api.put(`/update/exam/${examId}`,
                 {
-                    name: nameExam
+                    name: nameExam,
+                    isPublic: isPublic,
+                    timeLimit: timeLimit
                 }
             )
             if (res.status === 200) {
@@ -112,25 +109,6 @@ export default function ListSection() {
             }
         }
     }
-    const handleChangePrivacy = async () => {
-        try {
-            const res = await api.put(`/update/exam/${examId}`,
-                {
-                    isPublic: isPublic
-                }
-            )
-            if (res.status === 200) {
-                Swal.fire({ title: res.data.message, icon: "success" })
-            }
-        } catch (err) {
-            if (err.response && err.response.data && err.response.data.message) {
-                Swal.fire("Lỗi", err.response.data.message, "error")
-            } else {
-                Swal.fire("Lỗi", "Đã xảy ra lỗi khi đổi tên bài thi", "error")
-            }
-        }
-    }
-
     return (
         <div className="container-scroller">
             <Header />
@@ -169,7 +147,26 @@ export default function ListSection() {
                                                         </select>
                                                     </div>
                                                     </td>
-                                                    <td><label onClick={handleChangePrivacy} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <div className="input-group mb-3 mt-3">
+                                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Giới hạn thời gian </label>
+                                                            <select
+                                                                value={timeLimit}
+                                                                onChange={(e) => setTimeLimit(e.target.value)}
+                                                                className="form-select"
+                                                                id="inputGroupSelect01"
+                                                            >
+                                                                <option value="10">10 phút</option>
+                                                                <option value="15">15 phút</option>
+                                                                <option value="30">30 phút</option>
+                                                                <option value="60">60 phút</option>
+                                                                <option value="90">90 phút</option>
+                                                                <option value="120">120 phút</option>
+                                                            </select>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             </tbody>
 
@@ -231,7 +228,7 @@ export default function ListSection() {
                                 </div>
                             </div>
                         </div>
-                    </div >
+                    </div>
                 </div>
             </div>
         </div>

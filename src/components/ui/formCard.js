@@ -70,7 +70,7 @@ export default function FormCard({ onClose, slug, id }) {
                             </div>
 
                             <Link
-                                to={`/thi-thu/${slug}/${id}`}
+                                to={`/bai-thi/on-thi/${slug}/${id}`}
                                 state={{ shuffleAnswer, shuffleQuestion, autoTime }}
                                 className="btn btn-primary w-100">Xác nhận vào thi</Link>
                         </div>
