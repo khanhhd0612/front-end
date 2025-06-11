@@ -38,6 +38,7 @@ export default function InfomationExam() {
     const totalQuestions = data.sections?.reduce((total, section) => {
         return total + (section.questions?.length || 0);
     }, 0) || 0;
+    console.log(data)
     return (
         <div className="container-scroller">
             <Header />
@@ -53,7 +54,7 @@ export default function InfomationExam() {
                                 <div className="row">
                                     <div className="col-lg-4">
                                         <div className="my-5 px-3 w-100">
-                                            <img className="w-100" src="/assets/images/background-hoc-tap-54.jpg" alt="anh-bai-thi" />
+                                            <img className="w-100" src={data.imageUrl} alt="anh-bai-thi" />
                                         </div>
                                     </div>
                                     <div className="col-lg-4">

@@ -13,7 +13,7 @@ const TestExam = () => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [examTitle, setExamTitle] = useState('')
     const { id } = useParams()
-    const [time, setTime] = useState(1)
+    const [time, setTime] = useState(null)
     const [timeLimit, setTimeLimit] = useState(0)
     const [autoNext, setAutoNext] = useState(true)
     const [isSubmitted, setIsSubmitted] = useState(false)
@@ -52,37 +52,36 @@ const TestExam = () => {
             .finally(() => nProgress.done())
     }, [id])
 
+    // Set time only after questions are loaded and timeLimit is available
     useEffect(() => {
-        if (!timeLimit) return; // đảm bảo timeLimit có giá trị > 0
+        if (timeLimit && questions.length > 0) {
+            setTime(timeLimit * 60)
+            setIsSubmitted(false)
+        }
+    }, [timeLimit, questions.length])
 
-        setTime(timeLimit * 60);
-        setIsSubmitted(false);
-
-    }, [timeLimit]);
-
+    // Timer logic (only start when questions are ready)
     useEffect(() => {
-        if (time === null || isSubmitted) return;
+        if (isSubmitted || questions.length === 0 || time === null) return;
 
         if (time <= 0) {
-            clearInterval(timerRef.current);
-            if (!isSubmitted) {
-                handleSubmitExam();
-            }
-            return;
+            clearInterval(timerRef.current)
+            handleSubmitExam()
+            return
         }
 
         timerRef.current = setInterval(() => {
             setTime(prev => {
                 if (prev <= 1) {
-                    clearInterval(timerRef.current);
-                    return 0;
+                    clearInterval(timerRef.current)
+                    return 0
                 }
-                return prev - 1;
-            });
-        }, 1000);
+                return prev - 1
+            })
+        }, 1000)
 
-        return () => clearInterval(timerRef.current);
-    }, [time, isSubmitted]);
+        return () => clearInterval(timerRef.current)
+    }, [time, isSubmitted, questions.length])
 
     const handleAnswer = (answer) => {
         const updatedQuestions = [...questions]
@@ -115,35 +114,33 @@ const TestExam = () => {
         } catch (err) {
             Swal.fire({ title: err.message || 'Lỗi khi lưu điểm', icon: 'error' })
         }
-    }
+    };
 
     const handleSubmitExam = () => {
-        if (isSubmitted) return
+        if (isSubmitted || questions.length === 0) return
 
         clearInterval(timerRef.current)
         setIsSubmitted(true)
 
         const totalCorrect = questions.filter(q => q.correctAnswers.includes(q.selectedAnswer)).length
-        let score
-        if (totalCorrect > 1) {
-            score = ((totalCorrect / questions.length) * 10).toFixed(2)
-        } else {
-            score = 0
-        }
+        let score = totalCorrect > 1
+            ? ((totalCorrect / questions.length) * 10).toFixed(2)
+            : 0
 
         Swal.fire({
             title: 'Đã nộp bài!',
             html: `
-            <p>Số câu đúng: <b>${totalCorrect}/${questions.length}</b></p>
-            <p>Điểm: <b>${score}</b></p>
-            <p>Thời gian làm bài: <b>${formatTime(time)}</b></p>
-        `,
+                <p>Số câu đúng: <b>${totalCorrect}/${questions.length}</b></p>
+                <p>Điểm: <b>${score}</b></p>
+                <p>Thời gian làm bài: <b>${formatTime(time)}</b></p>
+            `,
             icon: 'success',
             confirmButtonText: 'OK'
         })
 
         saveScore(score, time)
     }
+
     const submitExam = () => {
         Swal.fire({
             title: "Nộp bài ?",
@@ -153,9 +150,9 @@ const TestExam = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 handleSubmitExam()
-                Swal.fire("Nộp bài thành công!", "", "success");
+                Swal.fire("Nộp bài thành công!", "", "success")
             }
-        });
+        })
     }
 
     const currentQ = questions[currentIndex]
@@ -166,6 +163,7 @@ const TestExam = () => {
             <div className="container-fluid">
                 <div className="main-content">
                     <div className="row mt-1">
+                        {/* Sidebar */}
                         <div className="col-lg-3 mt-1">
                             <div className="card p-3 py-3">
                                 <div className="card-title border-bottom">
@@ -204,6 +202,7 @@ const TestExam = () => {
                             </div>
                         </div>
 
+                        {/* Câu hỏi hiện tại */}
                         <div className="col-lg-6 mt-1">
                             <div className="card p-3 py-3">
                                 <div className="card-title">
@@ -241,6 +240,7 @@ const TestExam = () => {
                             </div>
                         </div>
 
+                        {/* Danh sách câu hỏi */}
                         <div className="col-lg-3 mt-1">
                             <div className="card p-3 py-3">
                                 <div className="card-title">
