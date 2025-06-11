@@ -128,6 +128,12 @@ export default function AddExam() {
             formData.append('sections', JSON.stringify(results.sections));
             if (image) {
                 formData.append('image', image);
+            } else {
+                Swal.fire({
+                    title: "Ảnh đề thi không được để trống",
+                    icon: "warning"
+                })
+                return
             }
 
             const response = await api.post(`/exam`, formData, {
@@ -246,12 +252,12 @@ export default function AddExam() {
                                             </select>
                                         </div>
                                         <div className="input-group mb-3 mt-3">
-                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Giới hạn thời gian </label>
+                                            <label className="input-group-text" htmlFor="inputGroupSelect022">Giới hạn thời gian </label>
                                             <select
                                                 value={timeLimit}
                                                 onChange={(e) => setTimeLimit(e.target.value)}
                                                 className="form-select"
-                                                id="inputGroupSelect01"
+                                                id="inputGroupSelect022"
                                             >
                                                 <option value="10">10 phút</option>
                                                 <option value="15">15 phút</option>
