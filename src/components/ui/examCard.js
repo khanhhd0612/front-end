@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 export default function ExamCard({ id, name, imageUrl, slug, time, createdBy }) {
     return (
         <div className="card card-img-holder">
-            <img className="p-1" src={imageUrl} alt="default-img" />
+            <img className="p-1" style={{ objectFit: "cover", width: "100%", height: "100%" }} src={imageUrl} alt="default-img" />
             <div className="card-body">
                 <div className="border-bottom border-top">
                     <div className="exam-info py-1">
