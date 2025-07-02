@@ -18,6 +18,8 @@ import ResetPassword from '../pages/auth/resetPassword';
 import ListScore from '../pages/score/listScore';
 import TestExam from '../pages/exam/testExam';
 import InfomationExam from '../pages/exam/examInfo';
+import SettingExam from '../pages/exam/settingExam';
+import AddQuestionImage from '../pages/question/addImageQuestion';
 
 const routes = [
   {
@@ -77,6 +79,10 @@ const routes = [
     element: <CheckLogin><ListSection /></CheckLogin>,
   },
   {
+    path: '/setting/exam/:examId',
+    element: <CheckLogin><SettingExam /></CheckLogin>,
+  },
+  {
     path: '/score/exam/:examId',
     element: <CheckLogin><ListScore /></CheckLogin>,
   },
@@ -87,6 +93,10 @@ const routes = [
   {
     path: '/edit/exam/:examId/section/:sectionId/question/add',
     element: <CheckLogin><AddQuestionForm /></CheckLogin>,
+  },
+  {
+    path: '/edit/exam/:examId/section/:sectionId/question-image/add',
+    element: <CheckLogin><AddQuestionImage /></CheckLogin>,
   },
   {
     path: '/edit/exam/:examId/section/:sectionId/question/:questionId',

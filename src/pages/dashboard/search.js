@@ -50,6 +50,7 @@ export default function Search() {
                                                     id={item._id}
                                                     name={item.name}
                                                     slug={item.slug}
+                                                    imageUrl={item.imageUrl || "/assets/images/background-hoc-tap-54.jpg"}
                                                     time={item.createdAt}
                                                     createdBy={item.createdBy.name || "Không rõ"}
                                                 />

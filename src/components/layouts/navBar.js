@@ -21,7 +21,7 @@ export default function NavBar() {
                     <div>
                         <Link to="/danh-sach-bai-thi" className="nav-link">
                             <span className="menu-title">Danh sách bài thi </span>
-                            <i className="fa fa-plus-square-o menu-icon"></i></Link>
+                            <i className="fa fa-list menu-icon"></i></Link>
                     </div>
                 </li>
             </ul>

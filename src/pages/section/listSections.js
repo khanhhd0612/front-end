@@ -4,25 +4,26 @@ import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import api from "../../config/axiosConfig"
+import nProgress from "nprogress"
 
 export default function ListSection() {
     const navigate = useNavigate();
     const [data, setData] = useState([])
     const [isPublic, setIsPublic] = useState(true)
     const [timeLimit, setTimeLimit] = useState(1)
-    const [nameExam, setNameExam] = useState('')
-    const [nameSection, setNameSection] = useState('')
     const { examId } = useParams()
 
     const fetchData = async () => {
         try {
+            nProgress.start()
             const res = await api.get(`/exam/${examId}/sections`)
-            setNameExam(res.data.exam)
             setData(res.data.section)
         } catch (err) {
             if (err.response?.status === 500) {
                 navigate('/500');
             }
+        } finally {
+            nProgress.done()
         }
     }
 
@@ -32,6 +33,7 @@ export default function ListSection() {
 
     const deleteSection = async (sectionId) => {
         try {
+            nProgress.start()
             const res = await api.delete(`/exam/${examId}/sections/${sectionId}`)
 
             if (res.status === 200) {
@@ -44,6 +46,8 @@ export default function ListSection() {
             } else {
                 Swal.fire("Lỗi", "Đã xảy ra lỗi khi xóa bài thi", "error")
             }
+        } finally {
+            nProgress.done()
         }
     }
 
@@ -61,45 +65,45 @@ export default function ListSection() {
             }
         })
     }
-    const handleReNameExam = async () => {
-        try {
-            const res = await api.put(`/update/exam/${examId}`,
-                {
-                    name: nameExam,
-                    isPublic: isPublic,
-                    timeLimit: timeLimit
-                }
-            )
-            if (res.status === 200) {
-                Swal.fire({ title: res.data.message, icon: "success" })
-            }
-        } catch (err) {
-            if (err.response && err.response.data && err.response.data.message) {
-                Swal.fire("Lỗi", err.response.data.message, "error")
-            } else {
-                Swal.fire("Lỗi", "Đã xảy ra lỗi khi đổi tên bài thi", "error")
-            }
-        }
-    }
 
     const addSection = async () => {
         try {
-            const validateName = nameSection.trim()
+            Swal.fire({
+                title: "Nhập tên phần thi",
+                input: "text",
+                inputAttributes: {
+                    autocapitalize: "off"
+                },
+                showCancelButton: true,
+                confirmButtonText: "Thêm",
+                showLoaderOnConfirm: true,
+                preConfirm: async (nameSection) => {
+                    try {
+                        nProgress.start()
+                        const validateName = nameSection.trim()
 
-            if (!validateName) {
-                Swal.fire({ title: "Tên phần thi không được để trống", icon: "warning" })
-                return
-            }
+                        if (!validateName) {
+                            Swal.fire({ title: "Tên phần thi không được để trống", icon: "warning" })
+                            return
+                        }
 
-            const res = await api.post(`/exam/${examId}/sections`,
-                { name: validateName }
-            )
+                        const res = await api.post(`/exam/${examId}/sections`,
+                            { name: validateName }
+                        )
 
-            if (res.status === 200) {
-                Swal.fire({ title: res.data.message, icon: "success" })
-                setNameSection('')
-                fetchData()
-            }
+                        if (res.status === 200) {
+                            Swal.fire({ title: res.data.message, icon: "success" })
+                            fetchData()
+                        }
+                    } catch (error) {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    } finally {
+                        nProgress.done()
+                    }
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            })
+
 
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
@@ -109,6 +113,49 @@ export default function ListSection() {
             }
         }
     }
+    const reNameSection = async (sectionId, nameSection) => {
+        Swal.fire({
+            title: "Nhập tên phần thi",
+            input: "text",
+            inputAttributes: {
+                autocapitalize: "off"
+            },
+            showCancelButton: true,
+            confirmButtonText: "Lưu",
+            showLoaderOnConfirm: true,
+            preConfirm: async (newNameSection) => {
+                try {
+                    nProgress.start()
+                    try {
+                        if (nameSection.trim() === newNameSection.trim()) {
+                            Swal.fire({ title: "Tên chưa thay đổi", icon: "info" })
+                            return;
+                        }
+                        const res = await api.put(`/exam/${examId}/sections/${sectionId}`,
+                            {
+                                name: newNameSection
+                            }
+                        )
+                        if (res.status === 200) {
+                            Swal.fire({ title: "Đổi tên thành công", icon: "success" })
+                            fetchData()
+                        }
+                    } catch (err) {
+                        if (err.response && err.response.data && err.response.data.message) {
+                            Swal.fire("Lỗi", err.response.data.message, "error")
+                        } else {
+                            Swal.fire("Lỗi", "Đã xảy ra lỗi khi đổi tên bài thi", "error")
+                        }
+                    }
+                } catch (error) {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                } finally {
+                    nProgress.done()
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        })
+    }
     return (
         <div className="container-scroller">
             <Header />
@@ -117,91 +164,24 @@ export default function ListSection() {
                 <div className="main-panel">
                     <div className="content-wrapper">
                         <div className="row">
-                            <div className="col-lg-6 grid-margin stretch-card">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <h4 className="card-title">Bài thi</h4>
-                                        <table className="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Đổi tên bài thi</th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td><input className="border rounded p-2 w-100" type="text" value={nameExam} onChange={(e) => { setNameExam(e.target.value) }} /></td>
-                                                    <td><label onClick={handleReNameExam} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><div className="input-group mb-3 mt-3">
-                                                        <label className="input-group-text" htmlFor="inputGroupSelect01">Quyền riêng tư </label>
-                                                        <select
-                                                            value={isPublic.toString()}
-                                                            onChange={(e) => setIsPublic(e.target.value === 'true')}
-                                                            className="form-select"
-                                                            id="inputGroupSelect01"
-                                                        >
-                                                            <option value="true">Công khai</option>
-                                                            <option value="false">Chỉ mình tôi </option>
-                                                        </select>
-                                                    </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div className="input-group mb-3 mt-3">
-                                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Giới hạn thời gian </label>
-                                                            <select
-                                                                value={timeLimit}
-                                                                onChange={(e) => setTimeLimit(e.target.value)}
-                                                                className="form-select"
-                                                                id="inputGroupSelect01"
-                                                            >
-                                                                <option value="10">10 phút</option>
-                                                                <option value="15">15 phút</option>
-                                                                <option value="30">30 phút</option>
-                                                                <option value="60">60 phút</option>
-                                                                <option value="90">90 phút</option>
-                                                                <option value="120">120 phút</option>
-                                                            </select>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-lg-6 grid-margin stretch-card">
-                                <div className="card">
-                                    <div className="card-body">
-                                        <h4 className="card-title">Thêm phần thi </h4>
-                                        <table className="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên phần thi </th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td><input className="border rounded p-2 w-100" type="text" placeholder="Nhập tên phần thi" required value={nameSection} onChange={(e) => { setNameSection(e.target.value) }} /></td>
-                                                    <td><label onClick={addSection} className="badge badge-success btn"><i className="fa fa-save"></i></label></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
                             <div className="col-lg-12 grid-margin stretch-card">
                                 <div className="card">
                                     <div className="card-body">
-                                        <h4 className="card-title">Danh sách phần thi</h4>
+                                        <div className="d-flex justify-content-between">
+                                            <h4 className="card-title">Danh sách phần thi</h4>
+                                            <div>
+                                                <div className="d-flex">
+                                                    <div title="Tìm kiếm" onClick={addSection} className="btn btn-primary d-flex align-item-center p-2 mx-1">
+                                                        <i className="fa fa-search p-1"></i>
+                                                        <a className="text-white p-1 text-decoration-none d-none d-md-block">Tìm kiếm</a>
+                                                    </div>
+                                                    <div title="Thêm phần thi" onClick={addSection} className="btn btn-success d-flex align-item-center p-2">
+                                                        <i className="fa fa-plus-square-o p-1"></i>
+                                                        <a className="text-white p-1 text-decoration-none d-none d-md-block">Thêm phần thi</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <table className="table">
                                             <thead>
                                                 <tr>
@@ -216,9 +196,9 @@ export default function ListSection() {
                                                         <td>{item.name}</td>
                                                         <td>{item.questions?.length}</td>
                                                         <td>
-                                                            <Link to={`/edit/exam/${examId}/section/${item._id}/question/add`}><label className="badge badge-success mx-1"><i className="fa fa-plus-square-o"></i></label></Link>
-                                                            <Link to={`/edit/exam/${examId}/section/${item._id}/questions`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
-                                                            <label onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
+                                                            <Link title="Danh sách câu hỏi" to={`/edit/exam/${examId}/section/${item._id}/questions`}><label className="badge badge-success mx-1"><i className="fa fa-th-list"></i></label></Link>
+                                                            <lable title="Đổi tên phần thi" onClick={() => reNameSection(item._id, item.name)} className="badge badge-warning mx-1" ><i className="fa fa-edit"></i></lable>
+                                                            <label title="Xóa" onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
                                                         </td>
                                                     </tr>
                                                 ))}

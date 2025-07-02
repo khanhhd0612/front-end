@@ -50,6 +50,50 @@ export default function ListExam() {
         }
     }
 
+    const searchExam = async (query) => {
+        try {
+            const res = await api.get(`/search`, {
+                params: { q: query }
+            })
+            if (res.data) {
+                setData(res.data)
+            }
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                Swal.fire("Lỗi", err.response.data.message, "error");
+            } else {
+                Swal.fire("Lỗi", "Đã xảy ra lỗi", "error");
+            }
+        } finally {
+
+        }
+    }
+    const handleSearch = async () => {
+        try {
+            Swal.fire({
+                title: "Nhập tên bài thi",
+                input: "text",
+                inputAttributes: {
+                    autocapitalize: "off"
+                },
+                showCancelButton: true,
+                confirmButtonText: "Thêm",
+                showLoaderOnConfirm: true,
+                preConfirm: async (query) => {
+                    searchExam(query)
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            })
+
+
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                Swal.fire("Lỗi", err.response.data.message, "error")
+            } else {
+                Swal.fire("Lỗi", "Đã xảy ra lỗi khi thêm phần thi", "error")
+            }
+        }
+    }
     const handleDelete = (examId) => {
         Swal.fire({
             title: "Xóa?",
@@ -80,7 +124,17 @@ export default function ListExam() {
                             <div className="col-lg-12 grid-margin stretch-card">
                                 <div className="card">
                                     <div className="card-body">
-                                        <h4 className="card-title">Danh sách bài thi</h4>
+                                        <div className="d-flex justify-content-between">
+                                            <h4 className="card-title">Danh sách bài thi</h4>
+                                            <div>
+                                                <div className="d-flex">
+                                                    <div onClick={handleSearch} title="Tìm kiếm" className="btn btn-primary d-flex align-item-center p-2 mx-1">
+                                                        <i className="fa fa-search p-1"></i>
+                                                        <a className="text-white p-1 text-decoration-none d-none d-md-block">Tìm kiếm</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         {data.length > 0 ? (
                                             <>
                                                 <table className="table">
@@ -88,7 +142,7 @@ export default function ListExam() {
                                                         <tr>
                                                             <th>Tên bài thi</th>
                                                             <th>Số phần thi</th>
-                                                            <th>Ngày tạo</th>
+                                                            <th className="d-none d-md-flex">Ngày tạo</th>
                                                             <th>Trạng thái</th>
                                                         </tr>
                                                     </thead>
@@ -97,36 +151,41 @@ export default function ListExam() {
                                                             <tr key={item._id}>
                                                                 <td>{item.name}</td>
                                                                 <td>{item.sections.length}</td>
-                                                                <td>{item.createdAt.slice(0, 10)}</td>
+                                                                <td className="d-none d-md-flex">{item.createdAt.slice(0, 10)}</td>
                                                                 <td>
-                                                                    <Link to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link>
-                                                                    <Link to={`/edit/exam/${item._id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
-                                                                    <label onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
+                                                                    <Link title="Xem điểm" to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link>
+                                                                    <Link title="Cài đặt" to={`/setting/exam/${item._id}`}><label className="badge badge-dark mx-1"><i className="fa fa-gear"></i></label></Link>
+                                                                    <Link title="Chỉnh sửa" to={`/edit/exam/${item._id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
+                                                                    <label title="Xóa" onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
                                                                 </td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
                                                 </table>
-                                                <ReactPaginate
-                                                    previousLabel={"←"}
-                                                    nextLabel={"→"}
-                                                    breakLabel={"..."}
-                                                    pageCount={totalPages}
-                                                    marginPagesDisplayed={2}
-                                                    pageRangeDisplayed={3}
-                                                    onPageChange={(selectedItem) => handlePageClick(selectedItem.selected + 1)}
-                                                    containerClassName={"pagination justify-content-end mt-4"}
-                                                    pageClassName={"page-item"}
-                                                    pageLinkClassName={"page-link"}
-                                                    previousClassName={"page-item"}
-                                                    previousLinkClassName={"page-link"}
-                                                    nextClassName={"page-item"}
-                                                    nextLinkClassName={"page-link"}
-                                                    breakClassName={"page-item"}
-                                                    breakLinkClassName={"page-link"}
-                                                    activeClassName={"active"}
-                                                    forcePage={page - 1}
-                                                />
+                                                {data.length > 10 ? (
+                                                    <ReactPaginate
+                                                        previousLabel={"←"}
+                                                        nextLabel={"→"}
+                                                        breakLabel={"..."}
+                                                        pageCount={totalPages}
+                                                        marginPagesDisplayed={2}
+                                                        pageRangeDisplayed={3}
+                                                        onPageChange={(selectedItem) => handlePageClick(selectedItem.selected + 1)}
+                                                        containerClassName={"pagination justify-content-end mt-4"}
+                                                        pageClassName={"page-item"}
+                                                        pageLinkClassName={"page-link"}
+                                                        previousClassName={"page-item"}
+                                                        previousLinkClassName={"page-link"}
+                                                        nextClassName={"page-item"}
+                                                        nextLinkClassName={"page-link"}
+                                                        breakClassName={"page-item"}
+                                                        breakLinkClassName={"page-link"}
+                                                        activeClassName={"active"}
+                                                        forcePage={page - 1}
+                                                    />
+                                                ) : (
+                                                    <></>
+                                                )}
                                             </>
                                         ) : (
                                             <div className="fx-1">

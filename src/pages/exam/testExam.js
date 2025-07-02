@@ -207,21 +207,29 @@ const TestExam = () => {
                             <div className="card p-3 py-3">
                                 <div className="card-title">
                                     <h5>Câu {currentIndex + 1}</h5>
-                                    <p>{currentQ?.text}</p>
+                                    <h4 className="lh-sm">{currentQ?.text}</h4>
                                 </div>
+                                {currentQ?.isQuestionImage ? (
+                                    <>
+                                        <img style={{ width: "300px" }} src={currentQ?.imageUrl} />
+                                    </>
+                                ) : (
+                                    <>
+                                    </>
+                                )}
                                 <div className="card-content">
                                     <div className="options">
                                         {currentQ?.answers.map((ans, i) => {
                                             const isSelected = currentQ.selectedAnswer === ans
-                                            let className = "btn border w-100 text-start mt-2"
+                                            let className = "fs-6 lh-sm btn border w-100 text-start mt-2"
 
                                             if (isSubmitted) {
                                                 const isCorrect = currentQ.correctAnswers.includes(ans)
-                                                if (isSelected && isCorrect) className = "btn btn-success text-white w-100 text-start mt-2"
-                                                else if (isSelected && !isCorrect) className = "btn btn-danger text-white w-100 text-start mt-2"
-                                                else if (!isSelected && isCorrect) className = "btn btn-success text-white w-100 text-start mt-2"
+                                                if (isSelected && isCorrect) className = "fs-6 lh-sm btn btn-success text-white w-100 text-start mt-2"
+                                                else if (isSelected && !isCorrect) className = "fs-6 lh-sm btn btn-danger text-white w-100 text-start mt-2"
+                                                else if (!isSelected && isCorrect) className = "fs-6 lh-sm btn btn-success text-white w-100 text-start mt-2"
                                             } else if (isSelected) {
-                                                className = "btn btn-info w-100 text-start mt-2"
+                                                className = "fs-6 lh-sm btn btn-info w-100 text-start mt-2"
                                             }
 
                                             return (

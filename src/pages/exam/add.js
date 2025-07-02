@@ -13,7 +13,7 @@ export default function AddExam() {
     const [results, setResults] = useState(null);
     const [parsedHtml, setParsedHtml] = useState('');
     const [loading, setLoading] = useState(false);
-    const [image, setImage] = useState(null); // NEW
+    const [image, setImage] = useState(null);
 
     const parseQuestions = (text) => {
         const lines = text.split('\n');
