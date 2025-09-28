@@ -63,6 +63,21 @@ export default function ListQuestion() {
             }
         })
     }
+    const hanldeAddQuestion = () => {
+        // Swal.fire({
+
+        //     title: "Thêm câu hỏi",
+        //     showDenyButton: true,
+        //     denyButtonText: "Thêm câu hỏi",
+        //     confirmButtonText: "Thêm câu hỏi có ảnh"
+        // }).then((result) => {
+        //     if (result.isConfirmed) {
+        //         navigate(`/edit/exam/${examId}/section/${sectionId}/question-image/add`)
+        //     } else if (result.isDenied) {
+        //         navigate(`/edit/exam/${examId}/section/${sectionId}/question/add`)
+        //     }
+        // });
+    }
     return (
         <div className="container-scroller">
             <Header />
@@ -82,9 +97,13 @@ export default function ListQuestion() {
                                                         <i className="fa fa-search p-1"></i>
                                                         <a className="text-white p-1 text-decoration-none d-none d-md-block">Tìm kiếm</a>
                                                     </div>
-                                                    <div title="Thêm phần thi" className="btn btn-success d-flex align-item-center p-2">
+                                                    <div title="Thêm câu hỏi" className="btn btn-success d-flex align-item-center p-2 mx-1">
                                                         <i className="fa fa-plus-square-o p-1"></i>
                                                         <Link to={`/edit/exam/${examId}/section/${sectionId}/question/add`} className="text-white p-1 text-decoration-none d-none d-md-block">Thêm câu hỏi</Link>
+                                                    </div>
+                                                    <div title="Thêm câu hỏi" className="btn btn-success d-flex align-item-center p-2">
+                                                        <i className="fa fa-plus-square-o p-1"></i>
+                                                        <Link to={`/edit/exam/${examId}/section/${sectionId}/question-image/add`} className="text-white p-1 text-decoration-none d-none d-md-block">Thêm câu hỏi có ảnh</Link>
                                                     </div>
                                                 </div>
                                             </div>
