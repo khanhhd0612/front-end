@@ -30,7 +30,7 @@ const TestExam = () => {
 
     useEffect(() => {
         nProgress.start()
-        api.get(`/exam/${id}`)
+        api.get(`/exams/${id}`)
             .then(res => {
                 const data = res.data
                 setExamTitle(data.name || "Đề thi không có tên")
@@ -52,7 +52,6 @@ const TestExam = () => {
             .finally(() => nProgress.done())
     }, [id])
 
-    // Set time only after questions are loaded and timeLimit is available
     useEffect(() => {
         if (timeLimit && questions.length > 0) {
             setTime(timeLimit * 60)
@@ -60,7 +59,6 @@ const TestExam = () => {
         }
     }, [timeLimit, questions.length])
 
-    // Timer logic (only start when questions are ready)
     useEffect(() => {
         if (isSubmitted || questions.length === 0 || time === null) return;
 
@@ -106,7 +104,7 @@ const TestExam = () => {
 
     const saveScore = async (score, time) => {
         try {
-            await api.post(`score`, {
+            await api.post(`exams/${id}/score`, {
                 examId: id,
                 score,
                 time
@@ -163,7 +161,6 @@ const TestExam = () => {
             <div className="container-fluid">
                 <div className="main-content">
                     <div className="row mt-1">
-                        {/* Sidebar */}
                         <div className="col-lg-3 mt-1">
                             <div className="card p-3 py-3">
                                 <div className="card-title border-bottom">
@@ -205,7 +202,7 @@ const TestExam = () => {
                         {/* Câu hỏi hiện tại */}
                         <div className="col-lg-6 mt-1">
                             <div className="card p-3 py-3">
-                                <div className="card-title">
+                                <div className="card-title" style={{ whiteSpace: "pre-line" }}>
                                     <h5>Câu {currentIndex + 1}</h5>
                                     <h4 className="lh-sm">{currentQ?.text}</h4>
                                 </div>

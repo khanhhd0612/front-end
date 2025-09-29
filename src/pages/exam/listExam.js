@@ -16,8 +16,8 @@ export default function ListExam() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`/user/exam/?page=${page}&limit=8`)
-            setData(res.data.exam)
+            const res = await api.get(`/exams/user/list?page=${page}&limit=8`)
+            setData(res.data.exams)
             setTotalPages(res.data.totalPages)
         } catch (err) {
             Swal.fire({ title: err, icon: "error" })
@@ -33,7 +33,7 @@ export default function ListExam() {
     const deleteExam = async (examId) => {
         try {
             nProgress.start()
-            const res = await api.delete(`/exam/delete/${examId}`)
+            const res = await api.delete(`/exams/${examId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: "Xóa thành công", icon: "success" })
@@ -52,7 +52,7 @@ export default function ListExam() {
 
     const searchExam = async (query) => {
         try {
-            const res = await api.get(`/search`, {
+            const res = await api.get(`/exams/search`, {
                 params: { q: query }
             })
             if (res.data) {
@@ -153,7 +153,7 @@ export default function ListExam() {
                                                                 <td>{item.sections.length}</td>
                                                                 <td className="d-none d-md-flex">{item.createdAt.slice(0, 10)}</td>
                                                                 <td>
-                                                                    <Link title="Xem điểm" to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link>
+                                                                    {/* <Link title="Xem điểm" to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link> */}
                                                                     <Link title="Cài đặt" to={`/setting/exam/${item._id}`}><label className="badge badge-dark mx-1"><i className="fa fa-gear"></i></label></Link>
                                                                     <Link title="Chỉnh sửa" to={`/edit/exam/${item._id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
                                                                     <label title="Xóa" onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>

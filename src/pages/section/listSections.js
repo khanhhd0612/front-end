@@ -16,7 +16,7 @@ export default function ListSection() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`/exam/${examId}/sections`)
+            const res = await api.get(`/exams/${examId}/sections`)
             setData(res.data.section)
         } catch (err) {
             if (err.response?.status === 500) {
@@ -34,7 +34,7 @@ export default function ListSection() {
     const deleteSection = async (sectionId) => {
         try {
             nProgress.start()
-            const res = await api.delete(`/exam/${examId}/sections/${sectionId}`)
+            const res = await api.delete(`/exams/${examId}/sections/${sectionId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: res.data.message, icon: "success" })
@@ -87,7 +87,7 @@ export default function ListSection() {
                             return
                         }
 
-                        const res = await api.post(`/exam/${examId}/sections`,
+                        const res = await api.post(`/exams/${examId}/sections`,
                             { name: validateName }
                         )
 
@@ -131,7 +131,7 @@ export default function ListSection() {
                             Swal.fire({ title: "Tên chưa thay đổi", icon: "info" })
                             return;
                         }
-                        const res = await api.put(`/exam/${examId}/sections/${sectionId}`,
+                        const res = await api.put(`/exams/${examId}/sections/${sectionId}`,
                             {
                                 name: newNameSection
                             }

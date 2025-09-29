@@ -15,7 +15,7 @@ export default function Test() {
 
         nProgress.start()
         try {
-            const res = await api.post(`forgot/password/`, { email })
+            const res = await api.post(`/auth/forgot-password`, { email })
             if (res.status === 200) {
                 Swal.fire({
                     title: res.data.message,

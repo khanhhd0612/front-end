@@ -18,7 +18,7 @@ export default function Login() {
 
         nProgress.start()
         try {
-            const response = await api.post(`/login`, { email, password })
+            const response = await api.post(`/auth/login`, { email, password })
             if (response.data.message) {
                 setEmail('')
                 setPassword('')

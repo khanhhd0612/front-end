@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../config/axiosConfig';
+import nProgress from 'nprogress';
 
 export default function AddQuestionForm() {
     const [questionText, setQuestionText] = useState('');
@@ -63,7 +64,8 @@ export default function AddQuestionForm() {
             correctAnswers: correctAnswer
         }
         try {
-            const res = await api.post(`/question/${examId}/${sectionId}`,
+            nProgress.start()
+            const res = await api.post(`/exams/${examId}/sections/${sectionId}/questions`,
                 {
                     text: questionText,
                     answers: answers,
@@ -86,6 +88,8 @@ export default function AddQuestionForm() {
             if (err.response && err.response.data && err.response.data.message) {
                 Swal.fire("Lỗi", err.response.data.message, "error")
             }
+        } finally{
+            nProgress.done()
         }
 
     };

@@ -34,7 +34,7 @@ export default function ChangePassword() {
         }
         try {
             nProgress.start()
-            const res = await api.put(`/user/update/password`, {
+            const res = await api.put(`/users/password`, {
                 oldPassword,
                 password,
             })

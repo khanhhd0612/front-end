@@ -17,7 +17,7 @@ export default function InfomationExam() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`exam/${id}`)
+            const res = await api.get(`exams/${id}`)
             if (res.status === 200) {
                 setData(res.data)
                 setExamTitle(res.data.name)
@@ -38,7 +38,6 @@ export default function InfomationExam() {
     const totalQuestions = data.sections?.reduce((total, section) => {
         return total + (section.questions?.length || 0);
     }, 0) || 0;
-    console.log(data)
     return (
         <div className="container-scroller">
             <Header />

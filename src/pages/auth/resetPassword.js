@@ -26,7 +26,7 @@ export default function ResetPassword() {
 
         try {
             nProgress.start()
-            const res = await api.put(`/reset/password/`,
+            const res = await api.put(`/auth/reset-password/`,
                 {
                     token,
                     password,

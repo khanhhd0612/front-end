@@ -123,7 +123,7 @@ export default function AddExam() {
 
             const formData = new FormData();
             formData.append('name', nameExam);
-            formData.append('isPublic', isPublic);
+            formData.append('isPublic', JSON.stringify(isPublic));
             formData.append('timeLimit', timeLimit);
             formData.append('sections', JSON.stringify(results.sections));
             if (image) {
@@ -136,7 +136,7 @@ export default function AddExam() {
                 return
             }
 
-            const response = await api.post(`/exam`, formData, {
+            const response = await api.post(`/exams`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -157,7 +157,12 @@ export default function AddExam() {
                 alert('Có lỗi xảy ra khi xuất đề!');
             }
         } catch (err) {
-            alert('Không thể kết nối tới máy chủ!');
+            Swal.fire({
+                title: "Lỗi",
+                text: err.response.data.message,
+                icon: "error",
+                draggable: true
+            });
         } finally {
             setLoading(false);
             nProgress.done()

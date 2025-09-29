@@ -40,7 +40,7 @@ export default function Register() {
     const register = async () => {
         try {
             nProgress.start()
-            const response = await api.post(`/register`, {
+            const response = await api.post(`/auth/register`, {
                 name,
                 email,
                 password,

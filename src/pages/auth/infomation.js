@@ -10,7 +10,7 @@ export default function Information() {
     const [name, setName] = useState('')
 
     const fetchData = async () => {
-        const res = await api.get(`/profile`)
+        const res = await api.get(`/users/profile`)
         setData(res.data)
         setName(res.data.name)
     }
@@ -37,7 +37,7 @@ export default function Information() {
     }
 
     const changeName = async () => {
-        const res = await api.post(`/user/update/name`,
+        const res = await api.put(`/users/name`,
             {
                 name,
             }

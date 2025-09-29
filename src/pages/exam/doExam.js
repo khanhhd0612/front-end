@@ -41,7 +41,7 @@ const DoExam = () => {
 
     useEffect(() => {
         nProgress.start()
-        api.get(`/exam/${id}`)
+        api.get(`/exams/${id}`)
             .then(res => {
                 const data = res.data
                 setExamTitle(data.name || "Đề thi không có tên")
@@ -202,7 +202,7 @@ const DoExam = () => {
 
                         <div className="col-lg-6 mt-1">
                             <div className="card abc p-3 py-3">
-                                <div className="card-title">
+                                <div className="card-title" style={{ whiteSpace: "pre-line" }}>
                                     <h5>Câu {currentIndex + 1}</h5>
                                     <h4 className="lh-sm" readOnly>{currentQ?.text}</h4>
                                 </div>

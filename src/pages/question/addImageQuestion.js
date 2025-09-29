@@ -5,6 +5,7 @@ import Cookies from 'js-cookie'
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import api from '../../config/axiosConfig';
+import nProgress from 'nprogress';
 
 export default function AddQuestionImage() {
     const [questionText, setQuestionText] = useState('');
@@ -71,7 +72,8 @@ export default function AddQuestionImage() {
             return
         }
         try {
-            const res = await api.post(`/question/image/${examId}/${sectionId}`, formData,
+            nProgress.start()
+            const res = await api.post(`/exams/${examId}/sections/${sectionId}/questions/image`, formData,
                 {
                     headers: {
                         authorization: `Bearer ${token}`,
@@ -87,13 +89,14 @@ export default function AddQuestionImage() {
                 });
                 setQuestionText('');
                 setAnswers(['']);
-                setImage(null)
                 setCorrectAnswer('');
             }
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 Swal.fire("Lỗi", err.response.data.message, "error")
             }
+        } finally{
+            nProgress.done()
         }
 
     };

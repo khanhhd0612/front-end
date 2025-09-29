@@ -17,7 +17,7 @@ export default function SettingExam() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`/exam/${examId}/sections`)
+            const res = await api.get(`/exams/${examId}/sections`)
             setNameExam(res.data.exam)
             setData(res.data.section)
         } catch (err) {
@@ -35,7 +35,7 @@ export default function SettingExam() {
     const handleUpdateExam = async () => {
         try {
             nProgress.start()
-            const res = await api.put(`/update/exam/${examId}`,
+            const res = await api.put(`/exams/${examId}`,
                 {
                     name: nameExam,
                     isPublic: isPublic,

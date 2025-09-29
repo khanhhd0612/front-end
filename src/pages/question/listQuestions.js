@@ -14,8 +14,8 @@ export default function ListQuestion() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`/question/${examId}/${sectionId}`)
-            setData(res.data.section.questions)
+            const res = await api.get(`/exams/${examId}/sections/${sectionId}/questions`)
+            setData(res.data.questions)
         } catch (err) {
             if (err.response?.status === 404) {
                 navigate('/500');
@@ -32,7 +32,7 @@ export default function ListQuestion() {
     const deleteQuestion = async (questionId) => {
         try {
             nProgress.start()
-            const res = await api.delete(`/question/${examId}/${sectionId}/${questionId}`)
+            const res = await api.delete(`/exams/${examId}/sections/${sectionId}/questions/${questionId}`)
 
             if (res.status === 200) {
                 Swal.fire({ title: res.data.message, icon: "success" })
@@ -62,21 +62,6 @@ export default function ListQuestion() {
                 deleteQuestion(questionId)
             }
         })
-    }
-    const hanldeAddQuestion = () => {
-        // Swal.fire({
-
-        //     title: "Thêm câu hỏi",
-        //     showDenyButton: true,
-        //     denyButtonText: "Thêm câu hỏi",
-        //     confirmButtonText: "Thêm câu hỏi có ảnh"
-        // }).then((result) => {
-        //     if (result.isConfirmed) {
-        //         navigate(`/edit/exam/${examId}/section/${sectionId}/question-image/add`)
-        //     } else if (result.isDenied) {
-        //         navigate(`/edit/exam/${examId}/section/${sectionId}/question/add`)
-        //     }
-        // });
     }
     return (
         <div className="container-scroller">

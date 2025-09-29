@@ -12,8 +12,8 @@ export default function ContentDashBoard() {
     const fetchData = async () => {
         nProgress.start()
         try {
-            const response = await api.get(`/exam?page=${page}&limit=8`)
-            const newData = response.data.exam
+            const response = await api.get(`/exams?page=${page}&limit=8`)
+            const newData = response.data.exams
             if (newData.length === 0) {
                 setHasMore(false)
             } else {

@@ -17,7 +17,7 @@ export default function Search() {
         try {
             NProgress.start()
             const q = new URLSearchParams(location.search).get("q") || ""
-            const res = await api.get(`/search`, {
+            const res = await api.get(`exams/search`, {
                 params: { q: q }
             })
             setData(res.data)

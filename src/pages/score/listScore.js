@@ -18,7 +18,7 @@ export default function ListScore() {
     const fetchData = async () => {
         try {
             nProgress.start()
-            const res = await api.get(`score/${examId}/?page=${page}&limit=8`)
+            const res = await api.get(`exams/${examId}/score?page=${page}&limit=8`)
             setData(res.data.score)
             setName(res.data.nameExam)
             setTotalPages(res.data.totalPages)
