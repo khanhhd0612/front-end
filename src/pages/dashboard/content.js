@@ -9,6 +9,9 @@ export default function ContentDashBoard() {
     const [hasMore, setHasMore] = useState(true)
     const [page, setPage] = useState(1)
 
+    useEffect(() => {
+        fetchData()
+    }, [page])
     const fetchData = async () => {
         nProgress.start()
         try {
@@ -26,10 +29,6 @@ export default function ContentDashBoard() {
             nProgress.done()
         }
     }
-
-    useEffect(() => {
-        fetchData()
-    }, [])
     return (
         <div>
             <div className="page-header">
@@ -50,14 +49,14 @@ export default function ContentDashBoard() {
                         <div className="row">
                             {
                                 data.map((item) => (
-                                    <div key={item._id} className="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3 stretch-card grid-margin">
+                                    <div key={item.id} className="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3 stretch-card grid-margin">
                                         <ExamCard
-                                            id={item._id}
+                                            id={item.id}
                                             name={item.name}
                                             slug={item.slug}
                                             imageUrl={item.imageUrl || "/assets/images/background-hoc-tap-54.jpg"}
                                             time={item.createdAt}
-                                            createdBy={item.createdBy.name || "Không rõ"}
+                                            createdBy={item.createdBy || "Không rõ"}
                                         />
                                     </div>
                                 ))

@@ -63,6 +63,51 @@ export default function ListQuestion() {
             }
         })
     }
+    const searchQuestion = async (query) => {
+        try {
+            nProgress.start()
+            const res = await api.get(`/exams/${examId}/sections/${sectionId}/questions/search`, {
+                params: { q: query }
+            })
+            if (res.data.results) {
+                setData(res.data.results)
+            }
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                Swal.fire("Lỗi", err.response.data.message, "error");
+            } else {
+                Swal.fire("Lỗi", "Đã xảy ra lỗi", "error");
+            }
+        } finally {
+            nProgress.done()
+        }
+    }
+    const handleSearch = async () => {
+        try {
+            Swal.fire({
+                title: "Nhập câu hỏi",
+                input: "text",
+                inputAttributes: {
+                    autocapitalize: "off"
+                },
+                showCancelButton: true,
+                confirmButtonText: "Tìm",
+                showLoaderOnConfirm: true,
+                preConfirm: async (query) => {
+                    searchQuestion(query)
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            })
+
+
+        } catch (err) {
+            if (err.response && err.response.data && err.response.data.message) {
+                Swal.fire("Lỗi", err.response.data.message, "error")
+            } else {
+                Swal.fire("Lỗi", "Đã xảy ra lỗi khi thêm phần thi", "error")
+            }
+        }
+    }
     return (
         <div className="container-scroller">
             <Header />
@@ -78,49 +123,97 @@ export default function ListQuestion() {
                                             <h4 className="card-title">Danh sách câu hỏi</h4>
                                             <div>
                                                 <div className="d-flex">
-                                                    <div title="Tìm kiếm" className="btn btn-primary d-flex align-item-center p-2 mx-1">
+                                                    <div onClick={handleSearch} title="Tìm kiếm" className="btn btn-primary d-flex align-item-center p-2 mx-1">
                                                         <i className="fa fa-search p-1"></i>
                                                         <a className="text-white p-1 text-decoration-none d-none d-md-block">Tìm kiếm</a>
                                                     </div>
-                                                    <div title="Thêm câu hỏi" className="btn btn-success d-flex align-item-center p-2 mx-1">
+                                                    <Link
+                                                        to={`/edit/exam/${examId}/section/${sectionId}/question/add`}
+                                                        title="Thêm câu hỏi"
+                                                        className="btn btn-success d-flex align-items-center p-2 mx-1"
+                                                    >
                                                         <i className="fa fa-plus-square-o p-1"></i>
-                                                        <Link to={`/edit/exam/${examId}/section/${sectionId}/question/add`} className="text-white p-1 text-decoration-none d-none d-md-block">Thêm câu hỏi</Link>
-                                                    </div>
-                                                    <div title="Thêm câu hỏi" className="btn btn-success d-flex align-item-center p-2">
+                                                        <span className="text-white p-1 text-decoration-none d-none d-md-block">
+                                                            Thêm câu hỏi
+                                                        </span>
+                                                    </Link>
+                                                    <Link
+                                                        to={`/edit/exam/${examId}/section/${sectionId}/question-image/add`}
+                                                        title="Thêm câu hỏi"
+                                                        className="btn btn-success d-flex align-items-center p-2 mx-1"
+                                                    >
                                                         <i className="fa fa-plus-square-o p-1"></i>
-                                                        <Link to={`/edit/exam/${examId}/section/${sectionId}/question-image/add`} className="text-white p-1 text-decoration-none d-none d-md-block">Thêm câu hỏi có ảnh</Link>
-                                                    </div>
+                                                        <span className="text-white p-1 text-decoration-none d-none d-md-block">
+                                                            Thêm câu hỏi có ảnh
+                                                        </span>
+                                                    </Link>
                                                 </div>
                                             </div>
                                         </div>
-                                        <table className="table mt-2">
-                                            <thead>
-                                                <tr>
-                                                    <th>Câu hỏi</th>
-                                                    <th>Số đáp án </th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {data.map((item) => (
-                                                    <tr key={item._id}>
-                                                        <td>{item.text.slice(0, 100)}</td>
-                                                        <td>{item.answers.length}</td>
-                                                        <td>
-                                                            <Link to={`/edit/exam/${examId}/section/${sectionId}/question/${item._id}`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
-                                                            <label onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+
+                                        {
+                                            data.length > 0 ? (
+                                                <>
+                                                    <div className="table-responsive w-100">
+                                                        <table className="table mt-2">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Câu hỏi</th>
+                                                                    <th className="d-none d-md-table-cell">Số đáp án</th>
+                                                                    <th>Trạng thái</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {data.map((item) => (
+                                                                    <tr key={item._id}>
+                                                                        <td
+                                                                            className="text-truncate"
+                                                                            style={{ maxWidth: "200px" }}
+                                                                            title={item.text}
+                                                                        >
+                                                                            {item.text}
+                                                                        </td>
+
+                                                                        <td
+                                                                            className="text-truncate d-none d-md-table-cell"
+                                                                            style={{ maxWidth: "100px" }}
+                                                                        >
+                                                                            {item.answers.length}
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <Link
+                                                                                to={`/edit/exam/${examId}/section/${sectionId}/question/${item._id}`}
+                                                                            >
+                                                                                <label className="badge badge-warning mx-1">
+                                                                                    <i className="fa fa-pencil"></i>
+                                                                                </label>
+                                                                            </Link>
+                                                                            <label
+                                                                                onClick={() => handleDelete(item._id)}
+                                                                                className="badge badge-danger"
+                                                                            >
+                                                                                <i className="fa fa-trash-o"></i>
+                                                                            </label>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div>Không tồn tại câu hỏi</div>
+                                            )
+                                        }
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }

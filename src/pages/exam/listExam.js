@@ -52,7 +52,7 @@ export default function ListExam() {
 
     const searchExam = async (query) => {
         try {
-            const res = await api.get(`/exams/search`, {
+            const res = await api.get(`/exams/user/search`, {
                 params: { q: query }
             })
             if (res.data) {
@@ -141,28 +141,25 @@ export default function ListExam() {
                                                     <thead>
                                                         <tr>
                                                             <th>Tên bài thi</th>
-                                                            <th>Số phần thi</th>
-                                                            <th className="d-none d-md-flex">Ngày tạo</th>
+                                                            <th className="d-none d-md-table-cell">Ngày tạo</th>
                                                             <th>Trạng thái</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {data.map((item) => (
-                                                            <tr key={item._id}>
+                                                            <tr key={item.id}>
                                                                 <td>{item.name}</td>
-                                                                <td>{item.sections.length}</td>
-                                                                <td className="d-none d-md-flex">{item.createdAt.slice(0, 10)}</td>
+                                                                <td className="d-none d-md-table-cell">{item.createdAt.slice(0, 10)}</td>
                                                                 <td>
                                                                     {/* <Link title="Xem điểm" to={`/score/exam/${item._id}`}><label className="badge badge-success mx-1"><i className="fa fa-eye"></i></label></Link> */}
-                                                                    <Link title="Cài đặt" to={`/setting/exam/${item._id}`}><label className="badge badge-dark mx-1"><i className="fa fa-gear"></i></label></Link>
-                                                                    <Link title="Chỉnh sửa" to={`/edit/exam/${item._id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
-                                                                    <label title="Xóa" onClick={() => handleDelete(item._id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
+                                                                    <Link title="Cài đặt" to={`/setting/exam/${item.id}`}><label className="badge badge-dark mx-1"><i className="fa fa-gear"></i></label></Link>
+                                                                    <Link title="Chỉnh sửa" to={`/edit/exam/${item.id}/sections/`}><label className="badge badge-warning mx-1"><i className="fa fa-pencil"></i></label></Link>
+                                                                    <label title="Xóa" onClick={() => handleDelete(item.id)} className="badge badge-danger"><i className="fa fa-trash-o"></i></label>
                                                                 </td>
                                                             </tr>
                                                         ))}
                                                     </tbody>
                                                 </table>
-                                                {data.length > 10 ? (
                                                     <ReactPaginate
                                                         previousLabel={"←"}
                                                         nextLabel={"→"}
@@ -183,9 +180,6 @@ export default function ListExam() {
                                                         activeClassName={"active"}
                                                         forcePage={page - 1}
                                                     />
-                                                ) : (
-                                                    <></>
-                                                )}
                                             </>
                                         ) : (
                                             <div className="fx-1">

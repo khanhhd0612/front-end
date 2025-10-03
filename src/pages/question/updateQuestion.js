@@ -274,13 +274,14 @@ export default function UpdateQuestionForm() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="form-group mt-3">
-                                            <input
-                                                type="text"
+                                        <div className="form-group">
+                                            <label htmlFor="exampleInputName1">Câu hỏi </label>
+                                            <textarea
+                                                placeholder="Nhập câu hỏi"
                                                 className="form-control"
                                                 value={questionText}
                                                 onChange={(e) => setQuestionText(e.target.value)}
-                                            />
+                                            ></textarea>
                                         </div>
                                         <div>
                                             {
